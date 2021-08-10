@@ -31,27 +31,39 @@ YoonImage::YoonImage(int nWidth, int nHeight, int nChannel) {
     memset(m_pBuffer, 0, sizeof(char) * m_nWidth * m_nHeight * m_nChannel);
 }
 
-YoonImage::YoonImage(const int* pBuffer, int nWidth, int nHeight) {
+YoonImage::YoonImage(int* pBuffer, int nWidth, int nHeight) {
     m_nWidth = nWidth;
     m_nHeight = nHeight;
     m_nChannel = 3;
     m_eFormat = GetFormatFromChannel(m_nChannel);
     m_pBuffer = (unsigned char *) malloc(sizeof(char) * m_nWidth * m_nHeight * m_nChannel);
-    int nSize = sizeof(pBuffer) / sizeof(int);
-    if (nSize != nWidth * nHeight) {
-        memset(m_pBuffer, 0, sizeof(char) * m_nWidth * m_nHeight * m_nChannel);
-    } else {
-        for (int i = 0; i < nSize; i++) {
-            unsigned char *pByte = ConvertByte(pBuffer[i]);
-            memcpy(m_pBuffer + i * sizeof(int), pByte, sizeof(int));
-            free(pByte);
-        }
+    for (int i = 0; i < nWidth * nHeight; i++) {
+        unsigned char *pByte = ConvertByte(pBuffer[i]);
+        memcpy(m_pBuffer + i * m_nChannel, pByte, sizeof(char) * m_nChannel);
+        delete pByte;
+    }
+}
+
+YoonImage::YoonImage(unsigned char *pBuffer, int nWidth, int nHeight, eYoonImageFormat eFormat) {
+    m_nWidth = nWidth;
+    m_nHeight = nHeight;
+    m_eFormat = eFormat;
+    m_nChannel = GetChannelFromFormat(m_eFormat);
+    pBuffer = (unsigned char *) malloc(sizeof(char) * m_nWidth * m_nHeight * m_nChannel);
+    switch (m_eFormat) {
+        case FORMAT_GRAY:
+            memcpy(m_pBuffer, pBuffer, sizeof(char) * m_nWidth * m_nHeight * m_nChannel);
+            break;
+        case FORMAT_RGB:
+        case FORMAT_RGB_MIXED:
+            for (int i = 0; i < nWidth * nHeight; i++) {
+                //
+            }
     }
 }
 
 YoonImage::~YoonImage() {
     if (m_pBuffer != nullptr) {
-        delete[] m_pBuffer;
         free(m_pBuffer);
     }
 }
@@ -63,7 +75,11 @@ int YoonImage::GetChannelFromFormat(eYoonImageFormat eFormat) {
             nChannel = 1;
             break;
         case FORMAT_RGB:
+        case FORMAT_RGB_PARALLEL:
+        case FORMAT_RGB_MIXED:
         case FORMAT_BGR:
+        case FORMAT_BGR_PARALLEL:
+        case FORMAT_BGR_MIXED:
             nChannel = 3;
             break;
         default:
@@ -73,7 +89,7 @@ int YoonImage::GetChannelFromFormat(eYoonImageFormat eFormat) {
 }
 
 eYoonImageFormat YoonImage::GetFormatFromChannel(int nChannel) {
-    eYoonImageFormat eFormat = FORMAT_UNFORMATTED;
+    eYoonImageFormat eFormat = FORMAT_NONE;
     switch (nChannel) {
         case 1:
             eFormat = FORMAT_GRAY;
@@ -88,7 +104,7 @@ eYoonImageFormat YoonImage::GetFormatFromChannel(int nChannel) {
 }
 
 unsigned char* YoonImage::ConvertByte(const int &nNumber) {
-    auto *pByte = new unsigned char[4];
+    auto* pByte = new unsigned char[4];
     pByte[0] = (nNumber & 0x000000ff);
     pByte[1] = (nNumber & 0x0000ff00) >> 8;
     pByte[2] = (nNumber & 0x00ff0000) >> 16;

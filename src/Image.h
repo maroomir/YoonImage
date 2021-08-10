@@ -31,8 +31,8 @@ public:
     ~YoonImage();
     YoonImage(const YoonImage &pImage);
     YoonImage(int nWidth, int nHeight, int nChannel);
-    YoonImage(const int *m_pBuffer, int nWidth, int nHeight);
-    YoonImage(unsigned char *m_pBuffer, int nWidth, int nHeight, eYoonImageFormat eFormat);
+    YoonImage(int *pBuffer, int nWidth, int nHeight);
+    YoonImage(unsigned char *pBuffer, int nWidth, int nHeight, eYoonImageFormat eFormat);
     YoonImage(void *pAddress, short nWidth, short nHeight, eYoonImageFormat eFormat);
 
     int GetWidth();

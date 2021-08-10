@@ -22,16 +22,14 @@ typedef enum {
 } eYoonDir2D;
 
 typedef enum {
-    FORMAT_UNFORMATTED = -1,
+    FORMAT_NONE = -1,
     FORMAT_GRAY,
     FORMAT_RGB,
+    FORMAT_RGB_PARALLEL,
+    FORMAT_RGB_MIXED,
     FORMAT_BGR,
+    FORMAT_BGR_PARALLEL,
+    FORMAT_BGR_MIXED,
 } eYoonImageFormat;
-
-typedef enum {
-    RGB_MODE_NONE = -1,
-    RGB_MODE_PARALLEL,
-    RGB_MODE_MIXED,
-} eYoonRGBMode;
 
 #endif //YOONIMAGE_ENUM_H
