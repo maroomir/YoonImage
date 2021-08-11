@@ -12,5 +12,4 @@ add_library(YoonImage
 
 # CMake instructions to test using the static library
 add_executable(ConsoleTest main.cpp)
-target_link_libraries(ConsoleTest YoonFigure)
 target_link_libraries(ConsoleTest YoonImage)

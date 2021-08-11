@@ -16,13 +16,15 @@ using namespace std;
 
 class YoonImage {
 private:
-    static int GetChannelFromFormat(eYoonImageFormat eFormat);
-    static eYoonImageFormat GetFormatFromChannel(int nChannel);
-    static unsigned char* ConvertByte(const int& nNumber);
-    static int ConvertInteger(const unsigned char* pByte);
+    static int ToChannel(eYoonImageFormat eFormat);
+    static eYoonImageFormat ToImageFormat(int nChannel);
+    static unsigned char* ToByte(const int& nNumber);
+    static int ToInteger(const unsigned char* pByte);
+    unsigned char* ToMixedColorBuffer(const unsigned char* pParallelBuffer, bool bReverseOrder);
+    unsigned char* ToParallelColorBuffer(const unsigned char* pMixedBuffer, bool bOrderRGB);
 
 private:
-    unsigned char *m_pBuffer;
+    unsigned char *m_pBuffer;  // "Gray" or Parallel Color Buffers (R + G + B)
     int m_nWidth, m_nHeight, m_nChannel;
     eYoonImageFormat m_eFormat;
 
@@ -33,17 +35,23 @@ public:
     YoonImage(int nWidth, int nHeight, int nChannel);
     YoonImage(int *pBuffer, int nWidth, int nHeight);
     YoonImage(unsigned char *pBuffer, int nWidth, int nHeight, eYoonImageFormat eFormat);
-    YoonImage(void *pAddress, short nWidth, short nHeight, eYoonImageFormat eFormat);
 
     int GetWidth();
     int GetHeight();
-    int GetPlane();
+    int GetChannel();
     int GetStride();
     unsigned char* GetBuffer();
+    unsigned char* CopyBuffer();
+    unsigned char* GetMixedColorBuffer();
     eYoonImageFormat GetImageFormat();
 
+    YoonImage* ToGrayImage();
+    YoonImage* ToRedBuffer();
+    YoonImage* ToGreenBuffer();
+    YoonImage* ToBlueBuffer();
+
     void CopyFrom(const YoonImage &pImage);
-    YoonImage Clone();
+    YoonImage* Clone();
     bool Equals(const YoonImage &pImage);
     bool LoadImage(string strImagePath);
     bool SaveImage(string strImagePath);
