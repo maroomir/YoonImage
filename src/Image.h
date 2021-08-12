@@ -46,15 +46,13 @@ public:
     eYoonImageFormat GetImageFormat();
 
     YoonImage* ToGrayImage();
-    YoonImage* ToRedBuffer();
-    YoonImage* ToGreenBuffer();
-    YoonImage* ToBlueBuffer();
+    YoonImage* ToRedImage();
+    YoonImage* ToGreenImage();
+    YoonImage* ToBlueImage();
 
     void CopyFrom(const YoonImage &pImage);
     YoonImage* Clone();
     bool Equals(const YoonImage &pImage);
-    bool LoadImage(string strImagePath);
-    bool SaveImage(string strImagePath);
 };
 
 

@@ -318,7 +318,7 @@ YoonImage* YoonImage::ToGrayImage() {
     return pResultImage;
 }
 
-YoonImage* YoonImage::ToRedBuffer() {
+YoonImage* YoonImage::ToRedImage() {
     int nSize = m_nWidth * m_nHeight;
     auto *pResultBuffer = new unsigned char[sizeof(char) * nSize];
     switch (m_eFormat) {
@@ -330,7 +330,7 @@ YoonImage* YoonImage::ToRedBuffer() {
             memcpy(pResultBuffer, m_pBuffer + sizeof(char) * nSize * 2, sizeof(char) * nSize);
             break;
         default:
-            std::printf("[YOONIMAGE][ToRedBuffer] Abnormal Image Format");
+            std::printf("[YOONIMAGE][ToRedImage] Abnormal Image Format");
             memset(pResultBuffer, 0, sizeof(char) * nSize);
             break;
     }
@@ -340,7 +340,7 @@ YoonImage* YoonImage::ToRedBuffer() {
     return pResultImage;
 }
 
-YoonImage* YoonImage::ToGreenBuffer() {
+YoonImage* YoonImage::ToGreenImage() {
     int nSize = m_nWidth * m_nHeight;
     auto *pResultBuffer = new unsigned char[sizeof(char) * nSize];
     switch (m_eFormat) {
@@ -352,7 +352,7 @@ YoonImage* YoonImage::ToGreenBuffer() {
             memcpy(pResultBuffer, m_pBuffer + sizeof(char) * nSize, sizeof(char) * nSize);
             break;
         default:
-            std::printf("[YOONIMAGE][ToGreenBuffer] Abnormal Image Format");
+            std::printf("[YOONIMAGE][ToGreenImage] Abnormal Image Format");
             memset(pResultBuffer, 0, sizeof(char) * nSize);
             break;
     }
@@ -362,7 +362,7 @@ YoonImage* YoonImage::ToGreenBuffer() {
     return pResultImage;
 }
 
-YoonImage* YoonImage::ToBlueBuffer() {
+YoonImage* YoonImage::ToBlueImage() {
     int nSize = m_nWidth * m_nHeight;
     auto *pResultBuffer = new unsigned char[sizeof(char) * nSize];
     switch (m_eFormat) {
@@ -374,7 +374,7 @@ YoonImage* YoonImage::ToBlueBuffer() {
             memcpy(pResultBuffer, m_pBuffer + sizeof(char) * nSize * 2, sizeof(char) * nSize);
             break;
         default:
-            std::printf("[YOONIMAGE][ToRedBuffer] Abnormal Image Format");
+            std::printf("[YOONIMAGE][ToRedImage] Abnormal Image Format");
             memset(pResultBuffer, 0, sizeof(char) * nSize);
             break;
     }
@@ -383,4 +383,3 @@ YoonImage* YoonImage::ToBlueBuffer() {
     delete[] pResultBuffer;
     return pResultImage;
 }
-
