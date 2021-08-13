@@ -47,7 +47,7 @@ YoonImage::YoonImage(int* pBuffer, int nWidth, int nHeight) {
 YoonImage::YoonImage(unsigned char *pBuffer, int nWidth, int nHeight, eYoonImageFormat eFormat) {
     m_nWidth = nWidth;
     m_nHeight = nHeight;
-    m_nChannel = ToChannel(m_eFormat);
+    m_nChannel = ToChannel(eFormat);
     switch (eFormat) {
         case FORMAT_GRAY:
             m_eFormat = FORMAT_GRAY;
@@ -287,9 +287,9 @@ YoonImage* YoonImage::ToGrayImage() {
             for (int iHeight = 0; iHeight < m_nHeight; iHeight++) {
                 for (int iWidth = 0; iWidth < m_nWidth; iWidth++) {
                     int nPos = iHeight * m_nWidth + iWidth;
-                    unsigned char pRed = pResultBuffer[nPos];
-                    unsigned char pGreen = pResultBuffer[nSize + nPos];
-                    unsigned char pBlue = pResultBuffer[2 * nSize + nPos];
+                    unsigned char pRed = m_pBuffer[nPos];
+                    unsigned char pGreen = m_pBuffer[nSize + nPos];
+                    unsigned char pBlue = m_pBuffer[2 * nSize + nPos];
                     // ITU-RBT.709, YPrPb
                     pResultBuffer[nPos] = (unsigned char) (0.299 + pRed + 0.587 * pGreen + 0.114 * pBlue);
                 }
@@ -299,9 +299,9 @@ YoonImage* YoonImage::ToGrayImage() {
             for (int iHeight = 0; iHeight < m_nHeight; iHeight++) {
                 for (int iWidth = 0; iWidth < m_nWidth; iWidth++) {
                     int nPos = iHeight * m_nWidth + iWidth;
-                    unsigned char pBlue = pResultBuffer[nPos];
-                    unsigned char pGreen = pResultBuffer[nSize + nPos];
-                    unsigned char pRed = pResultBuffer[2 * nSize + nPos];
+                    unsigned char pBlue = m_pBuffer[nPos];
+                    unsigned char pGreen = m_pBuffer[nSize + nPos];
+                    unsigned char pRed = m_pBuffer[2 * nSize + nPos];
                     // ITU-RBT.709, YPrPb
                     pResultBuffer[nPos] = (unsigned char) (0.299 + pRed + 0.587 * pGreen + 0.114 * pBlue);
                 }
@@ -313,7 +313,7 @@ YoonImage* YoonImage::ToGrayImage() {
             break;
     }
 
-    auto *pResultImage = new YoonImage(pResultBuffer, m_nWidth, m_nHeight, m_eFormat);
+    auto *pResultImage = new YoonImage(pResultBuffer, m_nWidth, m_nHeight, FORMAT_GRAY);
     delete[] pResultBuffer;
     return pResultImage;
 }
@@ -335,7 +335,7 @@ YoonImage* YoonImage::ToRedImage() {
             break;
     }
 
-    auto *pResultImage = new YoonImage(pResultBuffer, m_nWidth, m_nHeight, m_eFormat);
+    auto *pResultImage = new YoonImage(pResultBuffer, m_nWidth, m_nHeight, FORMAT_GRAY);
     delete[] pResultBuffer;
     return pResultImage;
 }
@@ -357,7 +357,7 @@ YoonImage* YoonImage::ToGreenImage() {
             break;
     }
 
-    auto *pResultImage = new YoonImage(pResultBuffer, m_nWidth, m_nHeight, m_eFormat);
+    auto *pResultImage = new YoonImage(pResultBuffer, m_nWidth, m_nHeight, FORMAT_GRAY);
     delete[] pResultBuffer;
     return pResultImage;
 }
@@ -379,7 +379,7 @@ YoonImage* YoonImage::ToBlueImage() {
             break;
     }
 
-    auto *pResultImage = new YoonImage(pResultBuffer, m_nWidth, m_nHeight, m_eFormat);
+    auto *pResultImage = new YoonImage(pResultBuffer, m_nWidth, m_nHeight, FORMAT_GRAY);
     delete[] pResultBuffer;
     return pResultImage;
 }
