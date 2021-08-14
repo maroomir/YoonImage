@@ -276,7 +276,7 @@ bool YoonImage::Equals(const YoonImage &pImage) {
     return bEqual;
 }
 
-YoonImage* YoonImage::ToGrayImage() {
+unsigned char* YoonImage::ToGrayBuffer() {
     int nSize = m_nWidth * m_nHeight;
     auto *pResultBuffer = new unsigned char[sizeof(char) * nSize];
     switch (m_eFormat) {
@@ -291,7 +291,7 @@ YoonImage* YoonImage::ToGrayImage() {
                     unsigned char pGreen = m_pBuffer[nSize + nPos];
                     unsigned char pBlue = m_pBuffer[2 * nSize + nPos];
                     // ITU-RBT.709, YPrPb
-                    pResultBuffer[nPos] = (unsigned char) (0.299 + pRed + 0.587 * pGreen + 0.114 * pBlue);
+                    pResultBuffer[nPos] = (unsigned char) (0.299 * pRed + 0.587 * pGreen + 0.114 * pBlue);
                 }
             }
             break;
@@ -303,7 +303,7 @@ YoonImage* YoonImage::ToGrayImage() {
                     unsigned char pGreen = m_pBuffer[nSize + nPos];
                     unsigned char pRed = m_pBuffer[2 * nSize + nPos];
                     // ITU-RBT.709, YPrPb
-                    pResultBuffer[nPos] = (unsigned char) (0.299 + pRed + 0.587 * pGreen + 0.114 * pBlue);
+                    pResultBuffer[nPos] = (unsigned char) (0.299 * pRed + 0.587 * pGreen + 0.114 * pBlue);
                 }
             }
             break;
@@ -312,13 +312,17 @@ YoonImage* YoonImage::ToGrayImage() {
             memset(pResultBuffer, 0, sizeof(char) * nSize);
             break;
     }
+    return pResultBuffer;
+}
 
+YoonImage* YoonImage::ToGrayImage() {
+    unsigned char *pResultBuffer = ToGrayBuffer();
     auto *pResultImage = new YoonImage(pResultBuffer, m_nWidth, m_nHeight, FORMAT_GRAY);
     delete[] pResultBuffer;
     return pResultImage;
 }
 
-YoonImage* YoonImage::ToRedImage() {
+unsigned char* YoonImage::ToRedBuffer() {
     int nSize = m_nWidth * m_nHeight;
     auto *pResultBuffer = new unsigned char[sizeof(char) * nSize];
     switch (m_eFormat) {
@@ -334,13 +338,17 @@ YoonImage* YoonImage::ToRedImage() {
             memset(pResultBuffer, 0, sizeof(char) * nSize);
             break;
     }
+    return pResultBuffer;
+}
 
+YoonImage* YoonImage::ToRedImage() {
+    unsigned char *pResultBuffer = ToRedBuffer();
     auto *pResultImage = new YoonImage(pResultBuffer, m_nWidth, m_nHeight, FORMAT_GRAY);
     delete[] pResultBuffer;
     return pResultImage;
 }
 
-YoonImage* YoonImage::ToGreenImage() {
+unsigned char* YoonImage::ToGreenBuffer() {
     int nSize = m_nWidth * m_nHeight;
     auto *pResultBuffer = new unsigned char[sizeof(char) * nSize];
     switch (m_eFormat) {
@@ -356,13 +364,17 @@ YoonImage* YoonImage::ToGreenImage() {
             memset(pResultBuffer, 0, sizeof(char) * nSize);
             break;
     }
+    return pResultBuffer;
+}
 
+YoonImage* YoonImage::ToGreenImage() {
+    unsigned char* pResultBuffer = ToGreenBuffer();
     auto *pResultImage = new YoonImage(pResultBuffer, m_nWidth, m_nHeight, FORMAT_GRAY);
     delete[] pResultBuffer;
     return pResultImage;
 }
 
-YoonImage* YoonImage::ToBlueImage() {
+unsigned char* YoonImage::ToBlueBuffer() {
     int nSize = m_nWidth * m_nHeight;
     auto *pResultBuffer = new unsigned char[sizeof(char) * nSize];
     switch (m_eFormat) {
@@ -378,7 +390,11 @@ YoonImage* YoonImage::ToBlueImage() {
             memset(pResultBuffer, 0, sizeof(char) * nSize);
             break;
     }
+    return pResultBuffer;
+}
 
+YoonImage* YoonImage::ToBlueImage() {
+    unsigned char* pResultBuffer = ToBlueBuffer();
     auto *pResultImage = new YoonImage(pResultBuffer, m_nWidth, m_nHeight, FORMAT_GRAY);
     delete[] pResultBuffer;
     return pResultImage;

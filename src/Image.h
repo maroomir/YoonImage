@@ -49,6 +49,10 @@ public:
     YoonImage* ToRedImage();
     YoonImage* ToGreenImage();
     YoonImage* ToBlueImage();
+    unsigned char* ToGrayBuffer();
+    unsigned char* ToRedBuffer();
+    unsigned char* ToGreenBuffer();
+    unsigned char* ToBlueBuffer();
 
     void CopyFrom(const YoonImage &pImage);
     YoonImage* Clone();
