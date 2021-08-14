@@ -160,7 +160,7 @@ unsigned char* YoonImage::ToParallelColorBuffer(const unsigned char *pMixedBuffe
         int nColor = (bReverseOrder) ? m_nChannel - iColor - 1 : iColor;  // BRG or RGB
         for (int iY = 0; iY < m_nHeight; iY++) {
             for (int iX = 0; iX < m_nWidth; iX++) {
-                pResultBuffer[nStart + iY * m_nWidth + iX] = pMixedBuffer[iY * m_nWidth + iX * m_nChannel + nColor];
+                pResultBuffer[nStart + iY * m_nWidth + iX] = pMixedBuffer[iY * m_nWidth * m_nChannel + iX * m_nChannel + nColor];
             }
         }
     }
@@ -176,7 +176,7 @@ unsigned char* YoonImage::ToMixedColorBuffer(const unsigned char *pParallelBuffe
         int nColor = (bReverseOrder) ? m_nChannel - iColor - 1 : iColor;
         for (int iY = 0; iY < m_nHeight; iY++) {
             for (int iX = 0; iX < m_nWidth; iX++) {
-                pResultBuffer[iY * m_nWidth + iX * m_nChannel + nColor] = pParallelBuffer[nStart + iY * m_nWidth + iX];
+                pResultBuffer[iY * m_nWidth * m_nChannel + iX * m_nChannel + nColor] = pParallelBuffer[nStart + iY * m_nWidth + iX];
             }
         }
     }
