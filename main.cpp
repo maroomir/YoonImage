@@ -1,8 +1,8 @@
 //
 // Created by maroomir on 2021-07-05.
 //
-#include <iostream>
-#include "bitmap_image.hpp"  // https://github.com/ArashPartow/bitmap#readme
+// https://github.com/ArashPartow/bitmap#readme
+#include "bitmap_image.hpp"
 #include "src/Image.h"
 #include "src/enum.h"
 
@@ -52,11 +52,7 @@ YoonImage* load_image(string strPath) {
     bitmap_image pSourceBitmap(strPath);
     int nWidth = pSourceBitmap.width();
     int nHeight = pSourceBitmap.height();
-    int nChannel = 3;
-    auto *pBuffer = new unsigned char[sizeof(char) * nWidth * nHeight * nChannel];
-    memcpy(pBuffer, pSourceBitmap.data(), sizeof(char) * nWidth * nHeight * nChannel);
-    auto *pSourceImage = new YoonImage(pBuffer, nWidth, nHeight, FORMAT_BGR_MIXED);
-    delete[] pBuffer;
+    auto *pSourceImage = new YoonImage(pSourceBitmap.data(), nWidth, nHeight, FORMAT_BGR_MIXED);
     return pSourceImage;
 }
 
