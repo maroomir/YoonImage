@@ -57,6 +57,8 @@ public:
     void CopyFrom(const YoonImage &pImage);
     YoonImage* Clone();
     bool Equals(const YoonImage &pImage);
+    bool LoadImage(const string& strPath);
+    bool SaveImage(const string& strPath);
 };
 
 

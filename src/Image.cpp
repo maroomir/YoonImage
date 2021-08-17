@@ -3,6 +3,9 @@
 //
 
 #include "Image.h"
+#include "bitmap.h"
+#include <fstream>
+#include <iostream>
 
 YoonImage::YoonImage() {
     m_nWidth = IMAGE_DEFAULT_WIDTH;
@@ -398,4 +401,38 @@ YoonImage* YoonImage::ToBlueImage() {
     auto *pResultImage = new YoonImage(pResultBuffer, m_nWidth, m_nHeight, FORMAT_GRAY);
     delete[] pResultBuffer;
     return pResultImage;
+}
+
+bool YoonImage::LoadImage(const string &strFilePath) {
+    return false;
+}
+
+bool YoonImage::SaveImage(const string &strPath) {
+    ofstream pStream(strPath.c_str(), ios::binary);
+    if(!pStream) {
+        std::printf("[YOONIMAGE][SaveImage] File Path is not correct");
+        return false;
+    }
+
+    BITMAP_INFO_HEADER pInfoHeader;
+    pInfoHeader.width = m_nWidth;
+    pInfoHeader.height = m_nHeight;
+    pInfoHeader.bitCount = m_nChannel;
+    pInfoHeader.importantColor = 0;
+    pInfoHeader.usedColor = 0;
+    pInfoHeader.compression = 0;
+    pInfoHeader.planes = 1;
+    pInfoHeader.size = pInfoHeader.headerSize();
+    pInfoHeader.xPelsPerMeter = 0;
+    pInfoHeader.yPelsPerMeter = 0;
+    pInfoHeader.bufferSize = (((pInfoHeader.width * m_nChannel) + 3) & 0x0000FFFC) * pInfoHeader.height;
+    BITMAP_FILE_HEADER pFileHeader;
+    pFileHeader.type = 19778;
+    pFileHeader.size = pFileHeader.headerSize() + pInfoHeader.headerSize() + pInfoHeader.bufferSize;
+    pFileHeader.reserved1 = 0;
+    pFileHeader.reserved2 = 0;
+    pFileHeader.offBits = pInfoHeader.headerSize() + pFileHeader.headerSize();
+
+
+    return false;
 }
