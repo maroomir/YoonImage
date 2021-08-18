@@ -66,9 +66,13 @@ struct BITMAP_INFO_HEADER {
 bool IsBigEndian();
 unsigned short flipValue(const unsigned short& nValue);
 unsigned int flipValue(const unsigned int& nValue);
-void ReadBitmapFile(ifstream& pStream, BITMAP_FILE_HEADER& pHeader);
-void ReadBitmapInfo(ifstream& pStream, BITMAP_INFO_HEADER& pHeader);
-void WriteBitmapFile(ofstream& pStream, BITMAP_FILE_HEADER& pHeader);
-void WriteBitmapInfo(ifstream& pStream, BITMAP_INFO_HEADER& pHeader);
+template <typename T>
+void ReadStream(ifstream& pStream, T& value);
+template <typename T>
+void WriteStream(ofstream& pStream, T& value);
+void ReadBitmapFileHeader(ifstream& pStream, BITMAP_FILE_HEADER& pHeader);
+void ReadBitmapInfoHeader(ifstream& pStream, BITMAP_INFO_HEADER& pHeader);
+void WriteBitmapFileHeader(ofstream& pStream, BITMAP_FILE_HEADER& pHeader);
+void WriteBitmapInfoHeader(ofstream& pStream, BITMAP_INFO_HEADER& pHeader);
 
 #endif //YOONIMAGE_BITMAP_H

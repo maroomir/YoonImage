@@ -22,12 +22,22 @@ unsigned int flipValue(const unsigned int& nValue) {
     );
 }
 
-void ReadBitmapFile(ifstream& pStream, BITMAP_FILE_HEADER& pHeader) {
-    pStream.read(reinterpret_cast<char *>(&pHeader.type), sizeof(short));
-    pStream.read(reinterpret_cast<char *>(&pHeader.size), sizeof(int));
-    pStream.read(reinterpret_cast<char *>(&pHeader.reserved1), sizeof(short));
-    pStream.read(reinterpret_cast<char *>(&pHeader.reserved2), sizeof(short));
-    pStream.read(reinterpret_cast<char *>(&pHeader.offBits), sizeof(int));
+template <typename T>
+void ReadStream(ifstream& pStream, T& value) {
+    pStream.read(reinterpret_cast<char *>(&value), sizeof(T));
+}
+
+template <typename T>
+void WriteStream(ofstream& pStream, const T& value)  {
+    pStream.write(reinterpret_cast<const char*>(&value), sizeof(T));
+}
+
+void ReadBitmapFileHeader(ifstream& pStream, BITMAP_FILE_HEADER& pHeader) {
+    ReadStream(pStream, pHeader.type);
+    ReadStream(pStream, pHeader.size);
+    ReadStream(pStream, pHeader.reserved1);
+    ReadStream(pStream, pHeader.reserved2);
+    ReadStream(pStream, pHeader.offBits);
     if (IsBigEndian()) {
         pHeader.type = flipValue(pHeader.type);
         pHeader.size = flipValue(pHeader.size);
@@ -37,6 +47,73 @@ void ReadBitmapFile(ifstream& pStream, BITMAP_FILE_HEADER& pHeader) {
     }
 }
 
-void ReadBitmapInfo(ifstream& pStream, BITMAP_INFO_HEADER& pHeader);
-void WriteBitmapFile(ofstream& pStream, BITMAP_FILE_HEADER& pHeader);
-void WriteBitmapInfo(ifstream& pStream, BITMAP_INFO_HEADER& pHeader);
+void ReadBitmapInfoHeader(ifstream& pStream, BITMAP_INFO_HEADER& pHeader) {
+    ReadStream(pStream, pHeader.size);
+    ReadStream(pStream, pHeader.width);
+    ReadStream(pStream, pHeader.height);
+    ReadStream(pStream, pHeader.planes);
+    ReadStream(pStream, pHeader.bitCount);
+    ReadStream(pStream, pHeader.compression);
+    ReadStream(pStream, pHeader.bufferSize);
+    ReadStream(pStream, pHeader.xPelsPerMeter);
+    ReadStream(pStream, pHeader.yPelsPerMeter);
+    ReadStream(pStream, pHeader.usedColor);
+    ReadStream(pStream, pHeader.importantColor);
+    if (IsBigEndian()) {
+        pHeader.size = flipValue(pHeader.size);
+        pHeader.width = flipValue(pHeader.width);
+        pHeader.height = flipValue(pHeader.height);
+        pHeader.planes = flipValue(pHeader.planes);
+        pHeader.bitCount = flipValue(pHeader.bitCount);
+        pHeader.compression = flipValue(pHeader.compression);
+        pHeader.bufferSize = flipValue(pHeader.bufferSize);
+        pHeader.xPelsPerMeter = flipValue(pHeader.xPelsPerMeter);
+        pHeader.yPelsPerMeter = flipValue(pHeader.yPelsPerMeter);
+        pHeader.usedColor = flipValue(pHeader.usedColor);
+        pHeader.importantColor = flipValue(pHeader.importantColor);
+    }
+}
+
+void WriteBitmapFileHeader(ofstream& pStream, BITMAP_FILE_HEADER& pHeader) {
+    if (IsBigEndian()) {
+        WriteStream(pStream, flipValue(pHeader.type));
+        WriteStream(pStream, flipValue(pHeader.size));
+        WriteStream(pStream, flipValue(pHeader.reserved1));
+        WriteStream(pStream, flipValue(pHeader.reserved2));
+        WriteStream(pStream, flipValue(pHeader.offBits));
+    } else {
+        WriteStream(pStream, pHeader.type);
+        WriteStream(pStream, pHeader.size);
+        WriteStream(pStream, pHeader.reserved1);
+        WriteStream(pStream, pHeader.reserved2);
+        WriteStream(pStream, pHeader.offBits);
+    }
+}
+
+void WriteBitmapInfo(ofstream& pStream, BITMAP_INFO_HEADER& pHeader) {
+    if (IsBigEndian()) {
+        WriteStream(pStream, flipValue(pHeader.size));
+        WriteStream(pStream, flipValue(pHeader.width));
+        WriteStream(pStream, flipValue(pHeader.height));
+        WriteStream(pStream, flipValue(pHeader.planes));
+        WriteStream(pStream, flipValue(pHeader.bitCount));
+        WriteStream(pStream, flipValue(pHeader.compression));
+        WriteStream(pStream, flipValue(pHeader.bufferSize));
+        WriteStream(pStream, flipValue(pHeader.xPelsPerMeter));
+        WriteStream(pStream, flipValue(pHeader.yPelsPerMeter));
+        WriteStream(pStream, flipValue(pHeader.usedColor));
+        WriteStream(pStream, flipValue(pHeader.importantColor));
+    } else {
+        WriteStream(pStream, pHeader.size);
+        WriteStream(pStream, pHeader.width);
+        WriteStream(pStream, pHeader.height);
+        WriteStream(pStream, pHeader.planes);
+        WriteStream(pStream, pHeader.bitCount);
+        WriteStream(pStream, pHeader.compression);
+        WriteStream(pStream, pHeader.bufferSize);
+        WriteStream(pStream, pHeader.xPelsPerMeter);
+        WriteStream(pStream, pHeader.yPelsPerMeter);
+        WriteStream(pStream, pHeader.usedColor);
+        WriteStream(pStream, pHeader.importantColor);
+    }
+}

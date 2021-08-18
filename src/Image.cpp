@@ -432,7 +432,7 @@ bool YoonImage::SaveImage(const string &strPath) {
     pFileHeader.reserved1 = 0;
     pFileHeader.reserved2 = 0;
     pFileHeader.offBits = pInfoHeader.headerSize() + pFileHeader.headerSize();
-
-
+    WriteBitmapFileHeader(pStream, pFileHeader);
+    WriteBitmapInfoHeader(pStream, pInfoHeader);
     return false;
 }

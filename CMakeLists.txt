@@ -9,8 +9,9 @@ include_directories(include/bitmap)  # https://github.com/ArashPartow/bitmap#rea
 
 # CMake instructions to make the static library
 add_library(YoonImage
-        src/Image.cpp src/Image.h
-        src/enum.h src/bitmap.h src/bitmap.cpp)
+        src/Image.cpp src/bitmap.cpp
+        src/Image.h src/bitmap.h
+        src/enum.h)
 
 # CMake instructions to test using the static library
 add_executable(ConsoleTest main.cpp)
