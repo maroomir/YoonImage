@@ -7,9 +7,8 @@
 #include "src/enum.h"
 
 using namespace std;
-using namespace YoonImage;
 
-void save_image(Image* pImage, const string strPath) {
+void save_image(YoonImage* pImage, const string strPath) {
     int nWidth = pImage->GetWidth();
     int nHeight = pImage->GetHeight();
     bitmap_image pResultBitmap(nWidth, nHeight);
@@ -51,18 +50,18 @@ void save_image(Image* pImage, const string strPath) {
     pResultBitmap.save_image(strPath);
 }
 
-Image* load_image(string strPath) {
+YoonImage* load_image(string strPath) {
     bitmap_image pSourceBitmap(strPath);
     int nWidth = pSourceBitmap.width();
     int nHeight = pSourceBitmap.height();
-    auto *pSourceImage = new Image(pSourceBitmap.data(), nWidth, nHeight, FORMAT_BGR_MIXED);
+    auto *pSourceImage = new YoonImage(pSourceBitmap.data(), nWidth, nHeight, FORMAT_BGR_MIXED);
     return pSourceImage;
 }
 
 int main() {
-    Image *pImage = load_image("../sample/lena/lena512.bmp");
-    Image *pGrayImage = pImage->ToGrayImage();
-    save_image(pImage, "../result/lena_origin.bmp");
-    save_image(pGrayImage, "../result/lena_gray.bmp");
+    YoonImage pImage = YoonImage("../sample/lena/lena512.bmp");
+    YoonImage *pGrayImage = pImage.ToGrayImage();
+    pImage.SaveBitmap("../result/lena_origin.bmp");
+    pGrayImage->SaveBitmap("../result/lena_gray.bmp");
     return 0;
 }
