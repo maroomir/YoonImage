@@ -89,7 +89,7 @@ public:
     static void WriteBitmapInfoHeader(ofstream &pStream, BITMAP_INFO_HEADER &pHeader);
 
     static void
-    WriteBitmapBuffer(ofstream &pStream, const unsigned char *pBuffer, int nWidth, int nHeight, int nChannel);
+    WriteBitmapBuffer(ofstream &pStream, unsigned char *pBuffer, int nWidth, int nHeight, int nChannel);
 
     static unsigned char *
     ReadBitmapBuffer(ifstream &pStream, const string &strPath, int nInfoHeaderSize, int nFileHeaderSize,

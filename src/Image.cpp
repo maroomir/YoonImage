@@ -526,7 +526,7 @@ bool YoonImage::SaveBitmap(const string &strPath) {
             memset(pBufferSaved, 0, sizeof(char) * nSize);
             break;
     }
-    BitmapFactory::WriteBitmapBuffer(pStream, m_pBuffer, m_nWidth, m_nHeight, m_nChannel);
+    BitmapFactory::WriteBitmapBuffer(pStream, pBufferSaved, m_nWidth, m_nHeight, m_nChannel);
     pStream.close();
     delete[] pBufferSaved;
     return true;

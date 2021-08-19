@@ -125,26 +125,26 @@ void BitmapFactory::WriteBitmapInfoHeader(ofstream& pStream, BITMAP_INFO_HEADER&
     }
 }
 
-void BitmapFactory::WriteBitmapBuffer(ofstream &pStream, const unsigned char *pBuffer, int nWidth, int nHeight,
+void BitmapFactory::WriteBitmapBuffer(ofstream &pStream, unsigned char *pBuffer, int nWidth, int nHeight,
                                       int nChannel) {
     int nPlane = nWidth * nChannel;
-    unsigned int pPadding = (4 - ((3 * nWidth) % 4)) % 4;
+    unsigned int nPadding = (4 - ((3 * nWidth) % 4)) % 4;
     char pPadBuffer[4] = {0x00, 0x00, 0x00, 0x00};
     for (int iHeight = 0; iHeight < nHeight; ++iHeight) {
-        int iStart = iHeight * nPlane;
+        int iStart = (nHeight - iHeight - 1) * nPlane;
         pStream.write(reinterpret_cast<const char *>(pBuffer + sizeof(char) * iStart), sizeof(char) * nPlane);
-        pStream.write(pPadBuffer, pPadding);
+        pStream.write(pPadBuffer, nPadding);
     }
 }
 
 unsigned char *
 BitmapFactory::ReadBitmapBuffer(ifstream &pStream, const string &strPath, int nInfoHeaderSize, int nFileHeaderSize,
                                 int nWidth, int nHeight, int nChannel) {
-    unsigned int pPadding = (4 - ((3 * nWidth) % 4)) % 4;
+    unsigned int nPadding = (4 - ((3 * nWidth) % 4)) % 4;
     char pPadBuffer[4] = {0x00, 0x00, 0x00, 0x00};
     size_t nPhysicalSize = GetFileSize(strPath);
     size_t nLogicalSize = (nWidth * nWidth * nChannel) +
-                          (nHeight * pPadding) + nInfoHeaderSize + nFileHeaderSize;
+                          (nHeight * nPadding) + nInfoHeaderSize + nFileHeaderSize;
     if(nPhysicalSize != nLogicalSize) {
         cerr << "Mismatch between logical and physical sizes of bitmap. "
              << "Logical: " << nLogicalSize << " "
@@ -155,8 +155,9 @@ BitmapFactory::ReadBitmapBuffer(ifstream &pStream, const string &strPath, int nI
     int nPlane = nWidth * nChannel;
     auto *pBuffer = new unsigned char[nPlane * nHeight];
     for (int iHeight = 0; iHeight < nHeight; ++iHeight) {
-        int iStart = iHeight * nPlane;
+        int iStart = (nHeight - iHeight - 1) * nPlane;
         pStream.read(reinterpret_cast<char *>(pBuffer + sizeof(char) * iStart), sizeof(char) * nPlane);
-        pStream.read(pPadBuffer, pPadding);
+        pStream.read(pPadBuffer, nPadding);
     }
+    return pBuffer;
 }
