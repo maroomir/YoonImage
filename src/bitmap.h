@@ -63,6 +63,13 @@ struct BITMAP_INFO_HEADER {
     }
 };
 
+struct BITMAP_PALETTE {
+    unsigned char blue;
+    unsigned char green;
+    unsigned char red;
+    unsigned char reserved;
+};
+
 class BitmapFactory {
 private:
     static bool IsBigEndian();
@@ -92,8 +99,11 @@ public:
     WriteBitmapBuffer(ofstream &pStream, unsigned char *pBuffer, int nWidth, int nHeight, int nChannel);
 
     static unsigned char *
-    ReadBitmapBuffer(ifstream &pStream, const string &strPath, int nInfoHeaderSize, int nFileHeaderSize,
-                     int nWidth, int nHeight, int nChannel);
+    Read24BitBitmapBuffer(ifstream &pStream, const string &strPath, int nInfoHeaderSize, int nFileHeaderSize,
+                          int nWidth, int nHeight, int nChannel);
+
+    static BITMAP_PALETTE *
+    ReadBitmapPaletteTable(ifstream &pStream);
 };
 
 

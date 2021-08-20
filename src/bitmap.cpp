@@ -138,8 +138,8 @@ void BitmapFactory::WriteBitmapBuffer(ofstream &pStream, unsigned char *pBuffer,
 }
 
 unsigned char *
-BitmapFactory::ReadBitmapBuffer(ifstream &pStream, const string &strPath, int nInfoHeaderSize, int nFileHeaderSize,
-                                int nWidth, int nHeight, int nChannel) {
+BitmapFactory::Read24BitBitmapBuffer(ifstream &pStream, const string &strPath, int nInfoHeaderSize, int nFileHeaderSize,
+                                     int nWidth, int nHeight, int nChannel) {
     unsigned int nPadding = (4 - ((3 * nWidth) % 4)) % 4;
     char pPadBuffer[4] = {0x00, 0x00, 0x00, 0x00};
     size_t nPhysicalSize = GetFileSize(strPath);
