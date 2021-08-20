@@ -447,10 +447,9 @@ bool YoonImage::LoadBitmap(const string &strPath) {
     m_nChannel = pInfoHeader.bitCount >> 3;  // 0x00011000 => 0x00000011
     m_eFormat = ToImageFormat(m_nChannel);
     try {
-        unsigned char *pBuffer = BitmapFactory::Read24BitBitmapBuffer(pStream, strPath,
-                                                                      pInfoHeader.headerSize(),
-                                                                      pFileHeader.headerSize(),
-                                                                      m_nWidth, m_nHeight, m_nChannel);
+        if (m_eFormat == FORMAT_GRAY)
+            BitmapFactory::ReadBitmapPaletteTable(pStream);
+        unsigned char *pBuffer = BitmapFactory::ReadBitmapBuffer(pStream, strPath, m_nWidth, m_nHeight, m_nChannel);
         m_pBuffer = ToParallelColorBuffer(pBuffer, true);
         delete[] pBuffer;
         pStream.close();
@@ -509,7 +508,7 @@ bool YoonImage::SaveBitmap(const string &strPath) {
     switch (m_eFormat) {
         case FORMAT_GRAY:
             // Palette Table
-
+            BitmapFactory::WriteBitmapPaletteTable(pStream);
             // Pixel Buffer
             pBufferSaved = new unsigned char[sizeof(char) * nSize];
             memcpy(pBufferSaved, m_pBuffer, sizeof(char) * nSize);

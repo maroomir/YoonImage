@@ -125,6 +125,32 @@ void BitmapFactory::WriteBitmapInfoHeader(ofstream& pStream, BITMAP_INFO_HEADER&
     }
 }
 
+void BitmapFactory::WriteBitmapPaletteTable(ofstream &pStream) {
+    auto *pPalette = new BITMAP_PALETTE[256];
+    for (int i = 0; i < 256; i++) {
+        pPalette[i].red = (unsigned char) i;
+        pPalette[i].green = (unsigned char) i;
+        pPalette[i].blue = (unsigned char) i;
+        pPalette[i].reserved = (unsigned char) 0;
+    }
+    pStream.write(reinterpret_cast<const char *>(&pPalette), sizeof(char) * 1024);
+    delete[] pPalette;
+}
+
+BITMAP_PALETTE *BitmapFactory::ReadBitmapPaletteTable(ifstream &pStream) {
+    auto *pPaletteBuffer = new unsigned char[1024];
+    pStream.read(reinterpret_cast<char *>(pPaletteBuffer), sizeof(char) * 1024);
+    auto *pResultPalette = new BITMAP_PALETTE[1024];
+    for (int i = 0; i < 256; i++) {
+        pResultPalette[i].red = pPaletteBuffer[i * 4];
+        pResultPalette[i].green = pPaletteBuffer[i * 4 + 1];
+        pResultPalette[i].blue = pPaletteBuffer[i * 4 + 2];
+        pResultPalette[i].reserved = 0;
+    }
+    delete[] pPaletteBuffer;
+    return pResultPalette;
+}
+
 void BitmapFactory::WriteBitmapBuffer(ofstream &pStream, unsigned char *pBuffer, int nWidth, int nHeight,
                                       int nChannel) {
     int nPlane = nWidth * nChannel;
@@ -138,20 +164,9 @@ void BitmapFactory::WriteBitmapBuffer(ofstream &pStream, unsigned char *pBuffer,
 }
 
 unsigned char *
-BitmapFactory::Read24BitBitmapBuffer(ifstream &pStream, const string &strPath, int nInfoHeaderSize, int nFileHeaderSize,
-                                     int nWidth, int nHeight, int nChannel) {
+BitmapFactory::ReadBitmapBuffer(ifstream &pStream, const string &strPath, int nWidth, int nHeight, int nChannel) {
     unsigned int nPadding = (4 - ((3 * nWidth) % 4)) % 4;
     char pPadBuffer[4] = {0x00, 0x00, 0x00, 0x00};
-    size_t nPhysicalSize = GetFileSize(strPath);
-    size_t nLogicalSize = (nWidth * nWidth * nChannel) +
-                          (nHeight * nPadding) + nInfoHeaderSize + nFileHeaderSize;
-    if(nPhysicalSize != nLogicalSize) {
-        cerr << "Mismatch between logical and physical sizes of bitmap. "
-             << "Logical: " << nLogicalSize << " "
-             << "Physical: " << nPhysicalSize << std::endl;
-        throw -1;
-    }
-
     int nPlane = nWidth * nChannel;
     auto *pBuffer = new unsigned char[nPlane * nHeight];
     for (int iHeight = 0; iHeight < nHeight; ++iHeight) {

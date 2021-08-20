@@ -95,15 +95,15 @@ public:
 
     static void WriteBitmapInfoHeader(ofstream &pStream, BITMAP_INFO_HEADER &pHeader);
 
+    static void WriteBitmapPaletteTable(ofstream &pStream);
+
+    static BITMAP_PALETTE * ReadBitmapPaletteTable(ifstream &pStream);
+
     static void
     WriteBitmapBuffer(ofstream &pStream, unsigned char *pBuffer, int nWidth, int nHeight, int nChannel);
 
     static unsigned char *
-    Read24BitBitmapBuffer(ifstream &pStream, const string &strPath, int nInfoHeaderSize, int nFileHeaderSize,
-                          int nWidth, int nHeight, int nChannel);
-
-    static BITMAP_PALETTE *
-    ReadBitmapPaletteTable(ifstream &pStream);
+    ReadBitmapBuffer(ifstream &pStream, const string &strPath, int nWidth, int nHeight, int nChannel);
 };
 
 
