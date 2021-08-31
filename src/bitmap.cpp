@@ -126,21 +126,21 @@ void BitmapFactory::WriteBitmapInfoHeader(ofstream& pStream, BITMAP_INFO_HEADER&
 }
 
 void BitmapFactory::WriteBitmapPaletteTable(ofstream &pStream) {
-    auto *pPalette = new BITMAP_PALETTE[256];
+    auto *pPalette = new RGBQUAD_PALETTE[256];
     for (int i = 0; i < 256; i++) {
         pPalette[i].red = (unsigned char) i;
         pPalette[i].green = (unsigned char) i;
         pPalette[i].blue = (unsigned char) i;
         pPalette[i].reserved = (unsigned char) 0;
     }
-    pStream.write(reinterpret_cast<const char *>(&pPalette), sizeof(char) * 1024);
+    pStream.write(reinterpret_cast<const char *>(pPalette), sizeof(RGBQUAD_PALETTE) * 256);
     delete[] pPalette;
 }
 
-BITMAP_PALETTE *BitmapFactory::ReadBitmapPaletteTable(ifstream &pStream) {
+RGBQUAD_PALETTE *BitmapFactory::ReadBitmapPaletteTable(ifstream &pStream) {
     auto *pPaletteBuffer = new unsigned char[1024];
     pStream.read(reinterpret_cast<char *>(pPaletteBuffer), sizeof(char) * 1024);
-    auto *pResultPalette = new BITMAP_PALETTE[1024];
+    auto *pResultPalette = new RGBQUAD_PALETTE[1024];
     for (int i = 0; i < 256; i++) {
         pResultPalette[i].red = pPaletteBuffer[i * 4];
         pResultPalette[i].green = pPaletteBuffer[i * 4 + 1];

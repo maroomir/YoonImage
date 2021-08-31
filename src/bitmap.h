@@ -63,7 +63,7 @@ struct BITMAP_INFO_HEADER {
     }
 };
 
-struct BITMAP_PALETTE {
+struct RGBQUAD_PALETTE {
     unsigned char blue;
     unsigned char green;
     unsigned char red;
@@ -97,7 +97,7 @@ public:
 
     static void WriteBitmapPaletteTable(ofstream &pStream);
 
-    static BITMAP_PALETTE * ReadBitmapPaletteTable(ifstream &pStream);
+    static RGBQUAD_PALETTE * ReadBitmapPaletteTable(ifstream &pStream);
 
     static void
     WriteBitmapBuffer(ofstream &pStream, unsigned char *pBuffer, int nWidth, int nHeight, int nChannel);

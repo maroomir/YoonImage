@@ -61,6 +61,9 @@ public:
     bool Equals(const YoonImage &pImage);
     bool LoadBitmap(const string& strPath);
     bool SaveBitmap(const string& strPath);
+
+public:
+    static YoonImage* PaletteBar();
 };
 
 

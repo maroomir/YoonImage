@@ -486,20 +486,22 @@ bool YoonImage::SaveBitmap(const string &strPath) {
     pInfoHeader.width = m_nWidth;
     pInfoHeader.height = m_nHeight;
     pInfoHeader.bitCount = m_nChannel << 3;  // 0x00000011 => 0x00011000
-    pInfoHeader.importantColor = 0;
-    pInfoHeader.usedColor = 0;
     pInfoHeader.compression = 0;
     pInfoHeader.planes = 1;
     pInfoHeader.size = pInfoHeader.headerSize();
     pInfoHeader.xPelsPerMeter = 0;
     pInfoHeader.yPelsPerMeter = 0;
     pInfoHeader.bufferSize = (((pInfoHeader.width * m_nChannel) + 3) & 0x0000FFFC) * pInfoHeader.height;
+    pInfoHeader.importantColor = 0;
+    pInfoHeader.usedColor = 0;
     BITMAP_FILE_HEADER pFileHeader;
     pFileHeader.type = 19778;  // 0x4D42 (Static Number)
     pFileHeader.size = pFileHeader.headerSize() + pInfoHeader.headerSize() + pInfoHeader.bufferSize;
     pFileHeader.reserved1 = 0;
     pFileHeader.reserved2 = 0;
     pFileHeader.offBits = pInfoHeader.headerSize() + pFileHeader.headerSize();
+    if (m_eFormat == FORMAT_GRAY)
+        pFileHeader.offBits += sizeof(RGBQUAD_PALETTE) * 256;
     BitmapFactory::WriteBitmapFileHeader(pStream, pFileHeader);
     BitmapFactory::WriteBitmapInfoHeader(pStream, pInfoHeader);
 
@@ -535,4 +537,18 @@ bool YoonImage::SaveBitmap(const string &strPath) {
     pStream.close();
     delete[] pBufferSaved;
     return true;
+}
+
+YoonImage *YoonImage::PaletteBar() {
+    int nWidth = 2560;
+    int nHeight = 50;
+    auto *pBuffer = new unsigned char[nWidth * nHeight];
+    for (int iY = 0; iY < nHeight; iY++) {
+        for (int iX = 0; iX < nWidth; iX++) {
+            pBuffer[iY * nWidth + iX] = (unsigned char) (iX / 10);
+        }
+    }
+    auto *pResultImage = new YoonImage(pBuffer, nWidth, nHeight, FORMAT_GRAY);
+    delete[] pBuffer;
+    return pResultImage;
 }
