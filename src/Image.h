@@ -36,6 +36,7 @@ public:
     YoonImage(const string& strImagePath);
     YoonImage(int nWidth, int nHeight, int nChannel);
     YoonImage(int *pBuffer, int nWidth, int nHeight);
+    YoonImage(unsigned char *pRedBuffer, unsigned char *pGreenBuffer, unsigned char *pBlueBuffer, int nWidth, int nHeight);
     YoonImage(unsigned char *pBuffer, int nWidth, int nHeight, eYoonImageFormat eFormat);
 
     int GetWidth();
@@ -63,7 +64,8 @@ public:
     bool SaveBitmap(const string& strPath);
 
 public:
-    static YoonImage* PaletteBar();
+    static YoonImage* GrayPaletteBar();
+    static YoonImage* ColorPaletteBar();
 };
 
 

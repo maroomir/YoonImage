@@ -51,6 +51,22 @@ YoonImage::YoonImage(int* pBuffer, int nWidth, int nHeight) {
     }
 }
 
+YoonImage::YoonImage(unsigned char *pRedBuffer, unsigned char *pGreenBuffer, unsigned char *pBlueBuffer,
+                     int nWidth, int nHeight) {
+    m_nWidth = nWidth;
+    m_nHeight = nHeight;
+    m_nChannel = 3;
+    m_eFormat = FORMAT_RGB;
+    m_pBuffer = static_cast<unsigned char*>(malloc(sizeof(char) * m_nWidth * m_nHeight * m_nChannel));
+    int nSize = m_nWidth * m_nHeight;
+    int nCursor = 0;
+    memcpy(m_pBuffer, pRedBuffer, sizeof(char) * nSize);
+    nCursor += sizeof(char) * nSize;
+    memcpy(m_pBuffer + nCursor, pGreenBuffer, sizeof(char) * nSize);
+    nCursor += sizeof(char) * nSize;
+    memcpy(m_pBuffer + nCursor, pBlueBuffer, sizeof(char) * nSize);
+}
+
 YoonImage::YoonImage(unsigned char *pBuffer, int nWidth, int nHeight, eYoonImageFormat eFormat) {
     m_nWidth = nWidth;
     m_nHeight = nHeight;
@@ -75,10 +91,9 @@ YoonImage::YoonImage(unsigned char *pBuffer, int nWidth, int nHeight, eYoonImage
         case FORMAT_BGR_PARALLEL:
             m_eFormat = FORMAT_RGB;
             m_pBuffer = static_cast<unsigned char *>(malloc(sizeof(char) * m_nWidth * m_nHeight * m_nChannel));
-            for(int iColor = 0; iColor < m_nChannel; iColor++)
-            {
+            for(int iColor = 0; iColor < m_nChannel; iColor++) {
                 int nStart = (m_nChannel - iColor - 1) * m_nWidth * m_nHeight;
-                memcpy(m_pBuffer, pBuffer + sizeof(char) * nStart, sizeof(char) * m_nWidth * m_nHeight);
+                memcpy(m_pBuffer + sizeof(char) * nStart, pBuffer + sizeof(char) * nStart, sizeof(char) * m_nWidth * m_nHeight);
             }
             break;
         case FORMAT_BGR_MIXED:
@@ -444,7 +459,7 @@ bool YoonImage::LoadBitmap(const string &strPath) {
 
     m_nWidth = pInfoHeader.width;
     m_nHeight = pInfoHeader.height;
-    m_nChannel = pInfoHeader.bitCount >> 3;  // 0x00011000 => 0x00000011
+    m_nChannel = pInfoHeader.bitCount >> 3;  // 00011000 => 00000011
     m_eFormat = ToImageFormat(m_nChannel);
     try {
         if (m_eFormat == FORMAT_GRAY)
@@ -485,7 +500,7 @@ bool YoonImage::SaveBitmap(const string &strPath) {
     BITMAP_INFO_HEADER pInfoHeader;
     pInfoHeader.width = m_nWidth;
     pInfoHeader.height = m_nHeight;
-    pInfoHeader.bitCount = m_nChannel << 3;  // 0x00000011 => 0x00011000
+    pInfoHeader.bitCount = m_nChannel << 3;  // 00000011 => 00011000
     pInfoHeader.compression = 0;
     pInfoHeader.planes = 1;
     pInfoHeader.size = pInfoHeader.headerSize();
@@ -539,16 +554,59 @@ bool YoonImage::SaveBitmap(const string &strPath) {
     return true;
 }
 
-YoonImage *YoonImage::PaletteBar() {
-    int nWidth = 2560;
+YoonImage *YoonImage::GrayPaletteBar() {
+    int nStep = 10;
+    int nWidth = 256 * nStep;
     int nHeight = 50;
     auto *pBuffer = new unsigned char[nWidth * nHeight];
     for (int iY = 0; iY < nHeight; iY++) {
         for (int iX = 0; iX < nWidth; iX++) {
-            pBuffer[iY * nWidth + iX] = (unsigned char) (iX / 10);
+            pBuffer[iY * nWidth + iX] = (unsigned char) (iX / nStep);
         }
     }
     auto *pResultImage = new YoonImage(pBuffer, nWidth, nHeight, FORMAT_GRAY);
     delete[] pBuffer;
     return pResultImage;
 }
+
+YoonImage *YoonImage::ColorPaletteBar() {
+    int nStep = 10;
+    int nWidth = 256 * nStep;
+    int nChannel = 3;
+    int nHeight = 50;
+    auto *pRedBuffer = new unsigned char[nWidth * nHeight * nChannel];
+    auto *pGreenBuffer = new unsigned char[nWidth * nHeight * nChannel];
+    auto *pBlueBuffer = new unsigned char[nWidth * nHeight * nChannel];
+    for (int iY = 0; iY < nHeight; iY++) {
+        for (int iPage=0; iPage < nChannel; iPage++) {
+            for (int iX = 0; iX < nWidth; iX++) {
+                int iPos = iY * nWidth * nChannel + iPage * nWidth + iX;
+                switch(iPage) {
+                    case 0:  // RED Area
+                        pRedBuffer[iPos] = 255 - (unsigned char) (iX / nStep);
+                        pGreenBuffer[iPos] = (unsigned char) (iX / nStep);
+                        pBlueBuffer[iPos] = 0;
+                        break;
+                    case 1: // GREEN Area
+                        pRedBuffer[iPos] = 0;
+                        pGreenBuffer[iPos] = 255 - (unsigned char) (iX / nStep);
+                        pBlueBuffer[iPos] = (unsigned char) (iX / nStep);
+                        break;
+                    case 2: // BLUE Area
+                        pRedBuffer[iPos] = (unsigned char) (iX / nStep);
+                        pGreenBuffer[iPos] = 0;
+                        pBlueBuffer[iPos] = 255 - (unsigned char) (iX / nStep);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    }
+    auto *pResultImage = new YoonImage(pRedBuffer, pGreenBuffer, pBlueBuffer, nWidth * nChannel, nHeight);
+    delete[] pRedBuffer;
+    delete[] pGreenBuffer;
+    delete[] pBlueBuffer;
+    return pResultImage;
+}
+
