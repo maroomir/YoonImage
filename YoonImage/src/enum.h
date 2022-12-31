@@ -19,7 +19,7 @@ typedef enum {
     DIR_BOTTOM,
     DIR_BOTTOM_LEFT,
     DIR_LEFT,
-} eYoonDir2D;
+} eDir2D;
 
 typedef enum {
     FORMAT_NONE = -1,
@@ -30,6 +30,6 @@ typedef enum {
     FORMAT_BGR,
     FORMAT_BGR_PARALLEL,
     FORMAT_BGR_MIXED,
-} eYoonImageFormat;
+} eImageFormat;
 
 #endif //YOONIMAGE_ENUM_H

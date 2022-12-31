@@ -6,7 +6,7 @@
 #include <fstream>
 #include <iostream>
 
-YoonImage::YoonImage() {
+Image::Image() {
     m_nWidth = IMAGE_DEFAULT_WIDTH;
     m_nHeight = IMAGE_DEFAULT_HEIGHT;
     m_nChannel = IMAGE_DEFAULT_CHANNEL;
@@ -15,7 +15,7 @@ YoonImage::YoonImage() {
     memset(m_pBuffer, 0, sizeof(char) * m_nWidth * m_nHeight);
 }
 
-YoonImage::YoonImage(const YoonImage &pImage) {
+Image::Image(const Image &pImage) {
     m_nWidth = pImage.m_nWidth;
     m_nHeight = pImage.m_nHeight;
     m_nChannel = pImage.m_nChannel;
@@ -25,11 +25,11 @@ YoonImage::YoonImage(const YoonImage &pImage) {
 }
 
 
-YoonImage::YoonImage(const string &strImagePath) {
+Image::Image(const string &strImagePath) {
     LoadBitmap(strImagePath);
 }
 
-YoonImage::YoonImage(int nWidth, int nHeight, int nChannel) {
+Image::Image(int nWidth, int nHeight, int nChannel) {
     m_nWidth = nWidth;
     m_nHeight = nHeight;
     m_nChannel = nChannel;
@@ -38,7 +38,7 @@ YoonImage::YoonImage(int nWidth, int nHeight, int nChannel) {
     memset(m_pBuffer, 0, sizeof(char) * m_nWidth * m_nHeight * m_nChannel);
 }
 
-YoonImage::YoonImage(int* pBuffer, int nWidth, int nHeight) {
+Image::Image(int* pBuffer, int nWidth, int nHeight) {
     m_nWidth = nWidth;
     m_nHeight = nHeight;
     m_nChannel = 3;
@@ -51,7 +51,7 @@ YoonImage::YoonImage(int* pBuffer, int nWidth, int nHeight) {
     }
 }
 
-YoonImage::YoonImage(unsigned char *pRedBuffer, unsigned char *pGreenBuffer, unsigned char *pBlueBuffer,
+Image::Image(unsigned char *pRedBuffer, unsigned char *pGreenBuffer, unsigned char *pBlueBuffer,
                      int nWidth, int nHeight) {
     m_nWidth = nWidth;
     m_nHeight = nHeight;
@@ -67,7 +67,7 @@ YoonImage::YoonImage(unsigned char *pRedBuffer, unsigned char *pGreenBuffer, uns
     memcpy(m_pBuffer + nCursor, pBlueBuffer, sizeof(char) * nSize);
 }
 
-YoonImage::YoonImage(unsigned char *pBuffer, int nWidth, int nHeight, eYoonImageFormat eFormat) {
+Image::Image(unsigned char *pBuffer, int nWidth, int nHeight, eImageFormat eFormat) {
     m_nWidth = nWidth;
     m_nHeight = nHeight;
     m_nChannel = ToChannel(eFormat);
@@ -101,7 +101,7 @@ YoonImage::YoonImage(unsigned char *pBuffer, int nWidth, int nHeight, eYoonImage
             m_pBuffer = ToParallelColorBuffer(pBuffer, true);
             break;
         default:
-            std::printf("[YOONIMAGE] Abnormal Image Format");
+            std::printf("[Image] Abnormal Image Format");
             m_eFormat = FORMAT_GRAY;
             m_pBuffer = static_cast<unsigned char *>(malloc(sizeof(char) * m_nWidth * m_nHeight * m_nChannel));
             memset(m_pBuffer, 0, sizeof(char) * m_nWidth * m_nHeight * m_nChannel);
@@ -109,14 +109,14 @@ YoonImage::YoonImage(unsigned char *pBuffer, int nWidth, int nHeight, eYoonImage
     }
 }
 
-YoonImage::~YoonImage() {
+Image::~Image() {
     if (!m_pBuffer) {
         free(m_pBuffer);
         m_pBuffer = nullptr;
     }
 }
 
-int YoonImage::ToChannel(eYoonImageFormat eFormat) {
+int Image::ToChannel(eImageFormat eFormat) {
     int nChannel = INVALID_INTEGER;
     switch (eFormat) {
         case FORMAT_GRAY:
@@ -131,14 +131,14 @@ int YoonImage::ToChannel(eYoonImageFormat eFormat) {
             nChannel = 3;
             break;
         default:
-            std::printf("[YOONIMAGE][ToChannel] Abnormal Image Format");
+            std::printf("[Image][ToChannel] Abnormal Image Format");
             break;
     }
     return nChannel;
 }
 
-eYoonImageFormat YoonImage::ToImageFormat(int nChannel) {
-    eYoonImageFormat eFormat = FORMAT_NONE;
+eImageFormat Image::ToImageFormat(int nChannel) {
+    eImageFormat eFormat = FORMAT_NONE;
     switch (nChannel) {
         case 1:
             eFormat = FORMAT_GRAY;
@@ -147,13 +147,13 @@ eYoonImageFormat YoonImage::ToImageFormat(int nChannel) {
             eFormat = FORMAT_RGB;
             break;
         default:
-            std::printf("[YOONIMAGE][ToImageFormat] Abnormal Image Channel");
+            std::printf("[Image][ToImageFormat] Abnormal Image Channel");
             break;
     }
     return eFormat;
 }
 
-unsigned char* YoonImage::ToByte(const int &nNumber) {
+unsigned char* Image::ToByte(const int &nNumber) {
     auto* pByte = new unsigned char[4];
     pByte[0] = (nNumber & 0x000000ff);
     pByte[1] = (nNumber & 0x0000ff00) >> 8;
@@ -162,7 +162,7 @@ unsigned char* YoonImage::ToByte(const int &nNumber) {
     return pByte;
 }
 
-int YoonImage::ToInteger(const unsigned char *pByte) {
+int Image::ToInteger(const unsigned char *pByte) {
     int nNumber = INVALID_INTEGER;
     int nLength = sizeof(pByte) / sizeof(char);
     if (pByte != nullptr && nLength >= 4) {
@@ -174,7 +174,7 @@ int YoonImage::ToInteger(const unsigned char *pByte) {
     return nNumber;
 }
 
-unsigned char* YoonImage::ToParallelColorBuffer(const unsigned char *pMixedBuffer, bool bReverseOrder) {
+unsigned char* Image::ToParallelColorBuffer(const unsigned char *pMixedBuffer, bool bReverseOrder) {
     unsigned char *pResultBuffer = static_cast<unsigned char *>(malloc(
             sizeof(char) * m_nWidth * m_nHeight * m_nChannel));
     for (int iColor = 0; iColor < m_nChannel; iColor++) {
@@ -189,7 +189,7 @@ unsigned char* YoonImage::ToParallelColorBuffer(const unsigned char *pMixedBuffe
     return pResultBuffer;
 }
 
-unsigned char* YoonImage::ToMixedColorBuffer(const unsigned char *pParallelBuffer, bool bReverseOrder) {
+unsigned char* Image::ToMixedColorBuffer(const unsigned char *pParallelBuffer, bool bReverseOrder) {
     unsigned char *pResultBuffer = static_cast<unsigned char *>(malloc(
             sizeof(char) * m_nWidth * m_nHeight * m_nChannel));
 
@@ -205,37 +205,37 @@ unsigned char* YoonImage::ToMixedColorBuffer(const unsigned char *pParallelBuffe
     return pResultBuffer;
 }
 
-int YoonImage::GetWidth() {
+int Image::GetWidth() {
     return m_nWidth;
 }
 
-int YoonImage::GetHeight() {
+int Image::GetHeight() {
     return m_nHeight;
 }
 
-int YoonImage::GetChannel() {
+int Image::GetChannel() {
     return m_nChannel;
 }
 
-int YoonImage::GetStride() {
+int Image::GetStride() {
     return m_nWidth * m_nChannel;
 }
 
-unsigned char* YoonImage::GetBuffer() {
+unsigned char* Image::GetBuffer() {
     return m_pBuffer;
 }
 
-unsigned char* YoonImage::CopyBuffer() {
+unsigned char* Image::CopyBuffer() {
     auto* pBuffer = static_cast<unsigned char *>(malloc(sizeof(char) * m_nWidth * m_nHeight * m_nChannel));
     memcpy(pBuffer, m_pBuffer, sizeof(char) * m_nWidth * m_nHeight * m_nChannel);
     return pBuffer;
 }
 
-eYoonImageFormat YoonImage::GetImageFormat() {
+eImageFormat Image::GetImageFormat() {
     return m_eFormat;
 }
 
-unsigned char* YoonImage::GetMixedColorBuffer() {
+unsigned char* Image::GetMixedColorBuffer() {
     unsigned char *pBuffer = nullptr;
     switch (m_eFormat) {
         case FORMAT_GRAY: {
@@ -254,13 +254,13 @@ unsigned char* YoonImage::GetMixedColorBuffer() {
             pBuffer = ToMixedColorBuffer(m_pBuffer, false);
             break;
         default:
-            std::printf("[YOONIMAGE][GetMixedColorBuffer] Abnormal Image Format");
+            std::printf("[Image][GetMixedColorBuffer] Abnormal Image Format");
             break;
     }
     return pBuffer;
 }
 
-void YoonImage::CopyFrom(const YoonImage &pImage) {
+void Image::CopyFrom(const Image &pImage) {
     m_nWidth = pImage.m_nWidth;
     m_nHeight = pImage.m_nHeight;
     m_nChannel = pImage.m_nChannel;
@@ -274,11 +274,11 @@ void YoonImage::CopyFrom(const YoonImage &pImage) {
     memcpy(m_pBuffer, pImage.m_pBuffer, sizeof(char)*m_nWidth*m_nHeight*m_nChannel);
 }
 
-YoonImage* YoonImage::Clone() {
-    return new YoonImage(m_pBuffer, m_nWidth, m_nHeight, m_eFormat);
+Image* Image::Clone() {
+    return new Image(m_pBuffer, m_nWidth, m_nHeight, m_eFormat);
 }
 
-bool YoonImage::Equals(const YoonImage &pImage) {
+bool Image::Equals(const Image &pImage) {
     bool bEqual = (m_nWidth == pImage.m_nWidth) &&
             (m_nHeight == pImage.m_nHeight) &&
             (m_nChannel == pImage.m_nChannel) &&
@@ -298,7 +298,7 @@ bool YoonImage::Equals(const YoonImage &pImage) {
     return bEqual;
 }
 
-unsigned char* YoonImage::ToGrayBuffer() {
+unsigned char* Image::ToGrayBuffer() {
     int nSize = m_nWidth * m_nHeight;
     auto *pResultBuffer = new unsigned char[sizeof(char) * nSize];
     switch (m_eFormat) {
@@ -330,21 +330,21 @@ unsigned char* YoonImage::ToGrayBuffer() {
             }
             break;
         default:
-            std::printf("[YOONIMAGE][ToGrayImage] Abnormal Image Format");
+            std::printf("[Image][ToGrayImage] Abnormal Image Format");
             memset(pResultBuffer, 0, sizeof(char) * nSize);
             break;
     }
     return pResultBuffer;
 }
 
-YoonImage* YoonImage::ToGrayImage() {
+Image* Image::ToGrayImage() {
     unsigned char *pResultBuffer = ToGrayBuffer();
-    auto *pResultImage = new YoonImage(pResultBuffer, m_nWidth, m_nHeight, FORMAT_GRAY);
+    auto *pResultImage = new Image(pResultBuffer, m_nWidth, m_nHeight, FORMAT_GRAY);
     delete[] pResultBuffer;
     return pResultImage;
 }
 
-unsigned char* YoonImage::ToRedBuffer() {
+unsigned char* Image::ToRedBuffer() {
     int nSize = m_nWidth * m_nHeight;
     auto *pResultBuffer = new unsigned char[sizeof(char) * nSize];
     switch (m_eFormat) {
@@ -356,21 +356,21 @@ unsigned char* YoonImage::ToRedBuffer() {
             memcpy(pResultBuffer, m_pBuffer + sizeof(char) * nSize * 2, sizeof(char) * nSize);
             break;
         default:
-            std::printf("[YOONIMAGE][ToRedImage] Abnormal Image Format");
+            std::printf("[Image][ToRedImage] Abnormal Image Format");
             memset(pResultBuffer, 0, sizeof(char) * nSize);
             break;
     }
     return pResultBuffer;
 }
 
-YoonImage* YoonImage::ToRedImage() {
+Image* Image::ToRedImage() {
     unsigned char *pResultBuffer = ToRedBuffer();
-    auto *pResultImage = new YoonImage(pResultBuffer, m_nWidth, m_nHeight, FORMAT_GRAY);
+    auto *pResultImage = new Image(pResultBuffer, m_nWidth, m_nHeight, FORMAT_GRAY);
     delete[] pResultBuffer;
     return pResultImage;
 }
 
-unsigned char* YoonImage::ToGreenBuffer() {
+unsigned char* Image::ToGreenBuffer() {
     int nSize = m_nWidth * m_nHeight;
     auto *pResultBuffer = new unsigned char[sizeof(char) * nSize];
     switch (m_eFormat) {
@@ -382,21 +382,21 @@ unsigned char* YoonImage::ToGreenBuffer() {
             memcpy(pResultBuffer, m_pBuffer + sizeof(char) * nSize, sizeof(char) * nSize);
             break;
         default:
-            std::printf("[YOONIMAGE][ToGreenImage] Abnormal Image Format");
+            std::printf("[Image][ToGreenImage] Abnormal Image Format");
             memset(pResultBuffer, 0, sizeof(char) * nSize);
             break;
     }
     return pResultBuffer;
 }
 
-YoonImage* YoonImage::ToGreenImage() {
+Image* Image::ToGreenImage() {
     unsigned char* pResultBuffer = ToGreenBuffer();
-    auto *pResultImage = new YoonImage(pResultBuffer, m_nWidth, m_nHeight, FORMAT_GRAY);
+    auto *pResultImage = new Image(pResultBuffer, m_nWidth, m_nHeight, FORMAT_GRAY);
     delete[] pResultBuffer;
     return pResultImage;
 }
 
-unsigned char* YoonImage::ToBlueBuffer() {
+unsigned char* Image::ToBlueBuffer() {
     int nSize = m_nWidth * m_nHeight;
     auto *pResultBuffer = new unsigned char[sizeof(char) * nSize];
     switch (m_eFormat) {
@@ -408,24 +408,24 @@ unsigned char* YoonImage::ToBlueBuffer() {
             memcpy(pResultBuffer, m_pBuffer + sizeof(char) * nSize * 2, sizeof(char) * nSize);
             break;
         default:
-            std::printf("[YOONIMAGE][ToRedImage] Abnormal Image Format");
+            std::printf("[Image][ToRedImage] Abnormal Image Format");
             memset(pResultBuffer, 0, sizeof(char) * nSize);
             break;
     }
     return pResultBuffer;
 }
 
-YoonImage* YoonImage::ToBlueImage() {
+Image* Image::ToBlueImage() {
     unsigned char* pResultBuffer = ToBlueBuffer();
-    auto *pResultImage = new YoonImage(pResultBuffer, m_nWidth, m_nHeight, FORMAT_GRAY);
+    auto *pResultImage = new Image(pResultBuffer, m_nWidth, m_nHeight, FORMAT_GRAY);
     delete[] pResultBuffer;
     return pResultImage;
 }
 
-bool YoonImage::LoadBitmap(const string &strPath) {
+bool Image::LoadBitmap(const string &strPath) {
     ifstream pStream(strPath.c_str(), ios::binary);
     if (!pStream) {
-        std::printf("[YOONIMAGE][LoadBitmap] File Path is not correct");
+        std::printf("[Image][LoadBitmap] File Path is not correct");
         return false;
     }
 
@@ -443,7 +443,7 @@ bool YoonImage::LoadBitmap(const string &strPath) {
     BitmapFactory::ReadBitmapFileHeader(pStream, pFileHeader);
     BitmapFactory::ReadBitmapInfoHeader(pStream, pInfoHeader);
     if (pInfoHeader.size != pInfoHeader.headerSize()) {
-        std::printf("[YOONIMAGE][LoadBitmap] Invalid Bitmap Size");
+        std::printf("[Image][LoadBitmap] Invalid Bitmap Size");
         pFileHeader.clear();
         pInfoHeader.clear();
         pStream.close();
@@ -470,7 +470,7 @@ bool YoonImage::LoadBitmap(const string &strPath) {
         pStream.close();
     }
     catch (int nCode) {
-        std::printf("[YOONIMAGE][LoadBitmap] Buffer Reading Error");
+        std::printf("[Image][LoadBitmap] Buffer Reading Error");
         pFileHeader.clear();
         pInfoHeader.clear();
         pStream.close();
@@ -486,14 +486,14 @@ bool YoonImage::LoadBitmap(const string &strPath) {
     return true;
 }
 
-bool YoonImage::SaveBitmap(const string &strPath) {
+bool Image::SaveBitmap(const string &strPath) {
     ofstream pStream(strPath.c_str(), ios::binary);
     if (!pStream) {
-        std::printf("[YOONIMAGE][SaveBitmap] File Path is not correct");
+        std::printf("[Image][SaveBitmap] File Path is not correct");
         return false;
     }
     if (!m_pBuffer) {
-        std::printf("[YOONIMAGE][SaveBitmap] Buffer is empty");
+        std::printf("[Image][SaveBitmap] Buffer is empty");
         return false;
     }
 
@@ -554,7 +554,7 @@ bool YoonImage::SaveBitmap(const string &strPath) {
     return true;
 }
 
-YoonImage *YoonImage::GrayPaletteBar() {
+Image *Image::GrayPaletteBar() {
     int nStep = 10;
     int nWidth = 256 * nStep;
     int nHeight = 50;
@@ -564,12 +564,12 @@ YoonImage *YoonImage::GrayPaletteBar() {
             pBuffer[iY * nWidth + iX] = (unsigned char) (iX / nStep);
         }
     }
-    auto *pResultImage = new YoonImage(pBuffer, nWidth, nHeight, FORMAT_GRAY);
+    auto *pResultImage = new Image(pBuffer, nWidth, nHeight, FORMAT_GRAY);
     delete[] pBuffer;
     return pResultImage;
 }
 
-YoonImage *YoonImage::ColorPaletteBar() {
+Image *Image::ColorPaletteBar() {
     int nStep = 10;
     int nWidth = 256 * nStep;
     int nChannel = 3;
@@ -603,7 +603,7 @@ YoonImage *YoonImage::ColorPaletteBar() {
             }
         }
     }
-    auto *pResultImage = new YoonImage(pRedBuffer, pGreenBuffer, pBlueBuffer, nWidth * nChannel, nHeight);
+    auto *pResultImage = new Image(pRedBuffer, pGreenBuffer, pBlueBuffer, nWidth * nChannel, nHeight);
     delete[] pRedBuffer;
     delete[] pGreenBuffer;
     delete[] pBlueBuffer;

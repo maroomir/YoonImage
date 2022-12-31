@@ -15,10 +15,10 @@ using namespace std;
 #define IMAGE_DEFAULT_WIDTH 640
 #define IMAGE_DEFAULT_HEIGHT 480
 
-class YoonImage {
+class Image {
 private:
-    static int ToChannel(eYoonImageFormat eFormat);
-    static eYoonImageFormat ToImageFormat(int nChannel);
+    static int ToChannel(eImageFormat eFormat);
+    static eImageFormat ToImageFormat(int nChannel);
     static unsigned char* ToByte(const int& nNumber);
     static int ToInteger(const unsigned char* pByte);
     unsigned char* ToMixedColorBuffer(const unsigned char* pParallelBuffer, bool bReverseOrder);
@@ -27,17 +27,17 @@ private:
 private:
     unsigned char *m_pBuffer;  // "Gray" or Parallel Color Buffers (R + G + B)
     int m_nWidth, m_nHeight, m_nChannel;
-    eYoonImageFormat m_eFormat;
+    eImageFormat m_eFormat;
 
 public:
-    YoonImage();
-    ~YoonImage();
-    YoonImage(const YoonImage &pImage);
-    YoonImage(const string& strImagePath);
-    YoonImage(int nWidth, int nHeight, int nChannel);
-    YoonImage(int *pBuffer, int nWidth, int nHeight);
-    YoonImage(unsigned char *pRedBuffer, unsigned char *pGreenBuffer, unsigned char *pBlueBuffer, int nWidth, int nHeight);
-    YoonImage(unsigned char *pBuffer, int nWidth, int nHeight, eYoonImageFormat eFormat);
+    Image();
+    ~Image();
+    Image(const Image &pImage);
+    Image(const string& strImagePath);
+    Image(int nWidth, int nHeight, int nChannel);
+    Image(int *pBuffer, int nWidth, int nHeight);
+    Image(unsigned char *pRedBuffer, unsigned char *pGreenBuffer, unsigned char *pBlueBuffer, int nWidth, int nHeight);
+    Image(unsigned char *pBuffer, int nWidth, int nHeight, eImageFormat eFormat);
 
     int GetWidth();
     int GetHeight();
@@ -46,26 +46,26 @@ public:
     unsigned char* GetBuffer();
     unsigned char* CopyBuffer();
     unsigned char* GetMixedColorBuffer();
-    eYoonImageFormat GetImageFormat();
+    eImageFormat GetImageFormat();
 
-    YoonImage* ToGrayImage();
-    YoonImage* ToRedImage();
-    YoonImage* ToGreenImage();
-    YoonImage* ToBlueImage();
+    Image* ToGrayImage();
+    Image* ToRedImage();
+    Image* ToGreenImage();
+    Image* ToBlueImage();
     unsigned char* ToGrayBuffer();
     unsigned char* ToRedBuffer();
     unsigned char* ToGreenBuffer();
     unsigned char* ToBlueBuffer();
 
-    void CopyFrom(const YoonImage &pImage);
-    YoonImage* Clone();
-    bool Equals(const YoonImage &pImage);
+    void CopyFrom(const Image &pImage);
+    Image* Clone();
+    bool Equals(const Image &pImage);
     bool LoadBitmap(const string& strPath);
     bool SaveBitmap(const string& strPath);
 
 public:
-    static YoonImage* GrayPaletteBar();
-    static YoonImage* ColorPaletteBar();
+    static Image* GrayPaletteBar();
+    static Image* ColorPaletteBar();
 };
 
 
