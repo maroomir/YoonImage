@@ -2,8 +2,8 @@
 // Created by 윤철중 on 2021/08/17.
 //
 
-#ifndef YOONIMAGE_BITMAP_H
-#define YOONIMAGE_BITMAP_H
+#ifndef YOONIMAGE_BITMAP_FACTORY_H
+#define YOONIMAGE_BITMAP_FACTORY_H
 
 #include <cstring>
 #include <iostream>
@@ -107,4 +107,4 @@ public:
 };
 
 
-#endif //YOONIMAGE_BITMAP_H
+#endif //YOONIMAGE_BITMAP_FACTORY_H

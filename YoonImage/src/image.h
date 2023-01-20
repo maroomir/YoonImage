@@ -5,8 +5,8 @@
 #ifndef YOONIMAGE_IMAGE_H
 #define YOONIMAGE_IMAGE_H
 
-#include "enum.h"
-#include "bitmap.h"
+#include "enums.h"
+#include "bitmap_factory.h"
 #include <string>
 
 using namespace std;
@@ -39,14 +39,14 @@ public:
     Image(unsigned char *pRedBuffer, unsigned char *pGreenBuffer, unsigned char *pBlueBuffer, int nWidth, int nHeight);
     Image(unsigned char *pBuffer, int nWidth, int nHeight, eImageFormat eFormat);
 
-    int GetWidth();
-    int GetHeight();
-    int GetChannel();
-    int GetStride();
+    int Width();
+    int Height();
+    int Channel();
+    int Stride();
     unsigned char* GetBuffer();
     unsigned char* CopyBuffer();
     unsigned char* GetMixedColorBuffer();
-    eImageFormat GetImageFormat();
+    eImageFormat ImageFormat();
 
     Image* ToGrayImage();
     Image* ToRedImage();

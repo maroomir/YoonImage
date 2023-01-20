@@ -1,7 +1,7 @@
 //
 // Created by 윤철중 on 2021/08/18.
 //
-#include "bitmap.h"
+#include "bitmap_factory.h"
 
 // Save the MSB(Most Significant Bit) first
 bool BitmapFactory::IsBigEndian() {

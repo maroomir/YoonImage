@@ -6,7 +6,9 @@
 #define YOONFACTORY_FIGURE_H
 
 struct IFigure {
-    virtual int PropertiesCount() = 0;
+    virtual const int PropertiesCount() = 0;
+
+    virtual void FromArgs(int argc, char *argv[]) = 0;
 
     virtual IFigure Clone() = 0;
 };

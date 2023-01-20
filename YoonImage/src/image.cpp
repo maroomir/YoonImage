@@ -2,9 +2,7 @@
 // Created by maroomir on 2021-07-05.
 //
 
-#include "Image.h"
-#include <fstream>
-#include <iostream>
+#include "image.h"
 
 Image::Image() {
     m_nWidth = IMAGE_DEFAULT_WIDTH;
@@ -205,19 +203,19 @@ unsigned char* Image::ToMixedColorBuffer(const unsigned char *pParallelBuffer, b
     return pResultBuffer;
 }
 
-int Image::GetWidth() {
+int Image::Width() {
     return m_nWidth;
 }
 
-int Image::GetHeight() {
+int Image::Height() {
     return m_nHeight;
 }
 
-int Image::GetChannel() {
+int Image::Channel() {
     return m_nChannel;
 }
 
-int Image::GetStride() {
+int Image::Stride() {
     return m_nWidth * m_nChannel;
 }
 
@@ -231,7 +229,7 @@ unsigned char* Image::CopyBuffer() {
     return pBuffer;
 }
 
-eImageFormat Image::GetImageFormat() {
+eImageFormat Image::ImageFormat() {
     return m_eFormat;
 }
 

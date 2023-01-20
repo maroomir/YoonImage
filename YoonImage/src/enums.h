@@ -2,8 +2,8 @@
 // Created by maroomir on 2021-07-05.
 //
 
-#ifndef YOONIMAGE_ENUM_H
-#define YOONIMAGE_ENUM_H
+#ifndef YOONIMAGE_ENUMS_H
+#define YOONIMAGE_ENUMS_H
 
 #define INVALID_INTEGER -65536
 #define INVALID_DOUBLE -65536.00
@@ -32,4 +32,4 @@ typedef enum {
     FORMAT_BGR_MIXED,
 } eImageFormat;
 
-#endif //YOONIMAGE_ENUM_H
+#endif //YOONIMAGE_ENUMS_H
