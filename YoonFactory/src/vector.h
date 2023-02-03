@@ -132,6 +132,10 @@ struct IVector3D : public IVector {
 
 class Vector2N : public IVector2D<int> {
 public:
+    Vector2N();
+
+    Vector2N(int x, int y);
+
     const int PropertiesCount() { return 2; }
 
     void FromArgs(int argc, char *argv[]);
@@ -156,7 +160,7 @@ public:
 
     int Y();
 
-    int* Array();
+    int *Array();
 
     void SetX(int x);
 
@@ -164,7 +168,7 @@ public:
 
     void SetXY(int x, int y);
 
-    void SetXY(int& xy);
+    void SetXY(int &xy);
 
     float Angle2D(IVector &vector);
 
@@ -186,29 +190,33 @@ public:
 
     IVector GetNextVector(int moveX, int moveY);
 
-    IVector GetNextVector(IVector& vector);
+    IVector GetNextVector(IVector &vector);
 
     IVector GetNextVector(eDir2D dir);
 
     IVector GetRotateVector(float angle);
 
-    IVector GetRotateVector(IVector& center, float angle);
+    IVector GetRotateVector(IVector &center, float angle);
 
     void Scale(int scaleX, int scaleY);
 
     void Move(int moveX, int moveY);
 
-    void Move(IVector& vector);
+    void Move(IVector &vector);
 
     void Move(eDir2D dir);
 
     void Rotate(float angle);
 
-    void Rotate(IVector& center, float angle);
+    void Rotate(IVector &center, float angle);
 };
 
 class Vector2D : public IVector2D<float> {
 public:
+    Vector2D();
+
+    Vector2D(float x, float y);
+
     const int PropertiesCount() { return 2; }
 
     void FromArgs(int argc, char *argv[]);
@@ -233,7 +241,7 @@ public:
 
     float Y();
 
-    float* Array();
+    float *Array();
 
     void SetX(float x);
 
@@ -241,7 +249,7 @@ public:
 
     void SetXY(float x, float y);
 
-    void SetXY(float& xy);
+    void SetXY(float &xy);
 
     float Angle2D(IVector &vector);
 
@@ -263,25 +271,25 @@ public:
 
     IVector GetNextVector(float moveX, float moveY);
 
-    IVector GetNextVector(IVector& vector);
+    IVector GetNextVector(IVector &vector);
 
     IVector GetNextVector(eDir2D dir);
 
     IVector GetRotateVector(float angle);
 
-    IVector GetRotateVector(IVector& center, float angle);
+    IVector GetRotateVector(IVector &center, float angle);
 
     void Scale(float scaleX, float scaleY);
 
     void Move(float moveX, float moveY);
 
-    void Move(IVector& vector);
+    void Move(IVector &vector);
 
     void Move(eDir2D dir);
 
     void Rotate(float angle);
 
-    void Rotate(IVector& center, float angle);
+    void Rotate(IVector &center, float angle);
 
 };
 

@@ -9,6 +9,8 @@
 #include "vector.h"
 #include "rect.h"
 
+#define _YOONLINE_INVALID_NUM = -65536;
+
 struct ILine : public IFigure {
     virtual float Length() = 0;
 
@@ -18,9 +20,9 @@ struct ILine : public IFigure {
 
     virtual ILine Clone() = 0;
 
-    virtual CopyFrom(ILine &line) = 0;
+    virtual void CopyFrom(ILine &line) = 0;
 
-    virtual Equals(ILine &line) = 0;
+    virtual bool Equals(ILine &line) = 0;
 
     virtual bool IsContain(IVector &vector) = 0;
 
@@ -50,6 +52,100 @@ struct ILine2D<T> : public ILine {
     virtual ILine FlipX(T x) = 0;
 
     virtual ILine FlipY(T y) = 0;
+};
+
+public class Line2N : ILine2D<int> {
+private:
+    Vector2N _startPos = new Vector2N();
+    Vector2N _endPos = new Vector2N();
+    float _slope;
+    float constant;
+
+public:
+    float Length();
+
+    float Slope();
+
+    float Constant();
+
+    ILine Clone();
+
+    void CopyFrom(ILine &line);
+
+    bool Equals(ILine &line);
+
+    bool IsContain(IVector &vector);
+
+    float Distance(IVector &vector);
+
+    IVector2D<int> StartPos();
+
+    IVector2D<int> EndPos();
+
+    IVector2D<int> CenterPos();
+
+    IRect2D<int> Area();
+
+    int X(int y);
+
+    int Y(int x);
+
+    IVector2D<int> Intersection(ILine &line);
+
+    void Fit(IYoonRect2D<int> &rect);
+
+    void Fit(int width, int height);
+
+    ILine FlipX(int x);
+
+    ILine FlipY(int y);
+};
+
+public class Line2D : ILine2D<float> {
+private:
+    Vector2D _startPos = new Vector2D();
+    Vector2D _endPos = new Vector2D();
+    float _slope;
+    float constant;
+
+public:
+    float Length();
+
+    float Slope();
+
+    float Constant();
+
+    ILine Clone();
+
+    void CopyFrom(ILine &line);
+
+    bool Equals(ILine &line);
+
+    bool IsContain(IVector &vector);
+
+    float Distance(IVector &vector);
+
+    IVector2D<float> StartPos();
+
+    IVector2D<float> EndPos();
+
+    IVector2D<float> CenterPos();
+
+    IRect2D<float> Area();
+
+    float X(float y);
+
+    float Y(float x);
+
+    IVector2D<float> Intersection(ILine &line);
+
+    void Fit(IYoonRect2D<float> &rect);
+
+    void Fit(float width, float height);
+
+    ILine FlipX(float x);
+
+    ILine FlipY(float y);
 };
 
 #endif //YOONFACTORY_LINE_H
