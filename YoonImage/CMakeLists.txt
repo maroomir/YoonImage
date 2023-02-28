@@ -1,10 +1,7 @@
-cmake_minimum_required(VERSION 3.20)
-project(YoonImage)
-
-set(CMAKE_CXX_STANDARD 17)
+# Link the directory for header and library
+# https://github.com/ArashPartow/bitmap#readme
+include_directories(include/bitmap)
 
 # CMake instructions to make the static library
-add_library(YoonImage
-        src/image.cpp src/bitmap_factory.cpp
-        src/image.h src/bitmap_factory.h
-        src/enums.h)
+file(GLOB_RECURSE SOURCES src/*.cpp)
+add_library(yoonimage ${SOURCES})

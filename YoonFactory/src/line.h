@@ -45,7 +45,7 @@ struct ILine2D<T> : public ILine {
 
     virtual IVector2D<T> Intersection(ILine &line) = 0;
 
-    virtual void Fit(IYoonRect2D<T> &rect) = 0;
+    virtual void Fit(IRect2D<T> &rect) = 0;
 
     virtual void Fit(T width, T height) = 0;
 
@@ -92,7 +92,7 @@ public:
 
     IVector2D<int> Intersection(ILine &line);
 
-    void Fit(IYoonRect2D<int> &rect);
+    void Fit(IRect2D<int> &rect);
 
     void Fit(int width, int height);
 
@@ -139,7 +139,7 @@ public:
 
     IVector2D<float> Intersection(ILine &line);
 
-    void Fit(IYoonRect2D<float> &rect);
+    void Fit(IRect2D<float> &rect);
 
     void Fit(float width, float height);
 

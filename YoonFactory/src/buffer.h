@@ -8,6 +8,11 @@
 #include "rect.h"
 #include "vector.h"
 
+#define YBUFFER_ERR_BUFFER "[YOONBUFFER] Abnormal buffer address"
+#define YBUFFER_ERR_LEN "[YOONBUFFER] Abnormal buffer length"
+#define YBUFFER_ERR_OUT_RANGE "[YOONBUFFER] Arguments are out of range"
+#define YBUFFER_ERR_NULL "[YOONBUFFER] Source buffer is null"
+
 struct IBuffer {
     virtual int Length() = 0;
 
@@ -19,38 +24,57 @@ struct IBuffer {
 
     virtual void CopyFrom(IBuffer &buffer) = 0;
 
-    IBuffer Clone() = 0;
+    virtual IBuffer Clone() = 0;
 };
 
 template <typename T>
-struct IBuffer<T> : public IBuffer {
-    virtual T* GetBuffer() = 0;
+struct IBuffer1D<T> : public IBuffer {
+    virtual int Length() = 0;
 
-    virtual T* CopyBuffer() = 0;
+    virtual void* GetAddress() = 0;
 
-    virtual bool SetBuffer(T* pBuffer) = 0;
-};
+    virtual void GetBuffer(T* pBuffer, int* length) = 0;
 
-template <typename T>
-struct IBuffer1D<T> : public IBuffer<T> {
-    virtual T* CopyBuffer(int start, int end) = 0;
+    virtual void CopyBuffer(T* pBuffer, int* length) = 0;
+
+    virtual void CopyBuffer(int start, int end, T* pBuffer) = 0;
+
+    virtual bool SetBuffer(void* pAddress, int length) = 0;
 
     virtual bool SetBuffer(T* pBuffer, int start, int end) = 0;
 
     virtual T Value(int pos) = 0;
 
     virtual bool SetValue(T value, int pos) = 0;
+
+    virtual bool Equals(IBuffer &buffer) = 0;
+
+    virtual void CopyFrom(IBuffer &buffer) = 0;
+
+    virtual IBuffer Clone() = 0;
 };
 
 template <typename T>
-struct IBuffer2D<T> : public IBuffer<T> {
+struct IBuffer2D<T> : public IBuffer {
+    virtual int Length() = 0;
+
     virtual int Rows() = 0;
 
     virtual int Cols() = 0;
 
-    virtual T* CopyBuffer(Rect2N &area) = 0;
+    virtual void* GetAddress() = 0;
 
-    virtual T* CopyBuffer(Vector2N &startVector, Vector2N &endVector) = 0;
+    virtual void GetBuffer(T* pBuffer, int* row, int* col) = 0;
+
+    virtual void CopyBuffer(T* pBuffer, int* row, int* col) = 0;
+
+    virtual void CopyBuffer(Rect2N &area, T* pBuffer) = 0;
+
+    virtual void CopyBuffer(Vector2N &startVector, Vector2N &endVector, T* pBuffer) = 0;
+
+    virtual bool SetBuffer(void* pAddress, int length) = 0;
+
+    virtual bool SetBuffer(void* pAddress, int row, int col) = 0;
 
     virtual bool SetBuffer(T* pBuffer, Rect2N &area) = 0;
 
@@ -63,35 +87,39 @@ struct IBuffer2D<T> : public IBuffer<T> {
     virtual bool SetValue(T value, int row, int col);
 
     virtual bool SetValue(T value, Vector2N vector);
+
+    virtual bool Equals(IBuffer &buffer) = 0;
+
+    virtual void CopyFrom(IBuffer &buffer) = 0;
+
+    virtual IBuffer Clone() = 0;
 };
 
-class YoonBuffer1D: public IBuffer1D<unsigned char> {
+class Buffer1D: public IBuffer1D<unsigned char> {
 private:
-    unsigned char* _pBuffer = null;
-
+    unsigned char *_pBuffer = null;
+    int _length;
 
 public:
-    YoonBuffer1D(int length);
+    Buffer1D();
 
-    YoonBuffer1D(void *pAddress, int length);
+    Buffer1D(int length);
 
-    YoonBuffer1D(unsigned char *pBuffer);
+    ~Buffer1D();
 
     int Length();
 
     void *GetAddress();
 
-    unsigned char *GetBuffer();
+    void GetBuffer(unsigned char *pBuffer, int *length);
 
-    unsigned char *CopyBuffer();
+    void CopyBuffer(unsigned char *pBuffer, int *length);
 
-    unsigned char *CopyBuffer(int start, int end);
+    void CopyBuffer(int start, int end, unsigned char *pBuffer);
 
     bool SetBuffer(void *pAddress, int length);
 
     bool SetBuffer(unsigned char *pBuffer, int start, int end);
-
-    bool SetBuffer(unsigned char *pBuffer);
 
     unsigned char Value(int pos);
 
@@ -102,18 +130,25 @@ public:
     void CopyFrom(IBuffer &buffer);
 
     IBuffer Clone();
+
+    bool operator==(const Buffer1D &other);
+
+    bool operator!=(const Buffer1D &other);
+
+    unsigned char &operator[](const int index);
 };
 
-class YoonBuffer2D: public IBuffer2D<unsigned char> {
+class Buffer2D: public IBuffer2D<unsigned char> {
 private:
     unsigned char* _pBuffer = null;
+    int _length;
+    int _row;
+    int _col;
 
 public:
-    YoonBuffer2D(int width, int height);
+    Buffer2D();
 
-    YoonBuffer2D(void* pAddress, int width, int height);
-
-    YoonBuffer2D(unsigned* pBuffer, int width, int height);
+    Buffer2D(int row, int col);
 
     int Length();
 
@@ -123,21 +158,21 @@ public:
 
     void* GetAddress();
 
-    unsigned char* GetBuffer();
+    void GetBuffer(unsigned char *pBuffer, int* row, int* col);
 
-    unsigned char* CopyBuffer();
+    void CopyBuffer(unsigned char *pBuffer, int* row, int* col);
 
-    unsigned char* CopyBuffer(Rect2N &area);
+    void CopyBuffer(Rect2N &area, unsigned char *pBuffer);
 
-    unsigned char* CopyBuffer(Vector2N &startVector, Vector2N &endVector);
+    void CopyBuffer(Vector2N &startVector, Vector2N &endVector, unsigned char *pBuffer);
+
+    bool SetBuffer(void* pAddress, int length);
+
+    bool SetBuffer(void* pAddress, int row, int col);
 
     bool SetBuffer(unsigned char* pBuffer, Rect2N &area);
 
     bool SetBuffer(unsigned char* pBuffer, Vector2N &startVector, Vector2N &endVector);
-
-    bool SetBuffer(unsigned char* pBuffer);
-
-    bool SetBuffer(void* pAddress, int length);
 
     unsigned char Value(int row, int col);
 
@@ -146,6 +181,28 @@ public:
     bool SetValue(unsigned char value, int row, int col);
 
     bool SetValue(unsigned char value, Vector2N vector);
+
+    bool Equals(IBuffer &buffer) = 0;
+
+    void CopyFrom(IBuffer &buffer) = 0;
+
+    IBuffer Clone() = 0;
+};
+
+
+class BufferFactory {
+public:
+    static Buffer1D &Create(void *pAddress, int length) {
+        Buffer1D *pBuffer = new Buffer1D();
+        pBuffer->SetBuffer(pAddress, length);
+        return &pBuffer;
+    }
+
+    static Buffer2D &Create(void *pAddress, int row, int col) {
+        Buffer2D *pBuffer = new Buffer2D();
+        pBuffer->SetBuffer(pAddress, row, col);
+        return &pBuffer;
+    }
 };
 
 #endif //YOONFACTORY_BUFFER_H

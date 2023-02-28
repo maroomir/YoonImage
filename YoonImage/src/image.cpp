@@ -99,7 +99,7 @@ Image::Image(unsigned char *pBuffer, int nWidth, int nHeight, eImageFormat eForm
             m_pBuffer = ToParallelColorBuffer(pBuffer, true);
             break;
         default:
-            std::printf("[Image] Abnormal Image Format");
+            std::printf("[Image] Abnormal Image Format\n");
             m_eFormat = FORMAT_GRAY;
             m_pBuffer = static_cast<unsigned char *>(malloc(sizeof(char) * m_nWidth * m_nHeight * m_nChannel));
             memset(m_pBuffer, 0, sizeof(char) * m_nWidth * m_nHeight * m_nChannel);
@@ -129,7 +129,7 @@ int Image::ToChannel(eImageFormat eFormat) {
             nChannel = 3;
             break;
         default:
-            std::printf("[Image][ToChannel] Abnormal Image Format");
+            std::printf("[Image][ToChannel] Abnormal Image Format\n");
             break;
     }
     return nChannel;
@@ -145,7 +145,7 @@ eImageFormat Image::ToImageFormat(int nChannel) {
             eFormat = FORMAT_RGB;
             break;
         default:
-            std::printf("[Image][ToImageFormat] Abnormal Image Channel");
+            std::printf("[Image][ToImageFormat] Abnormal Image Channel\n");
             break;
     }
     return eFormat;
@@ -252,7 +252,7 @@ unsigned char* Image::GetMixedColorBuffer() {
             pBuffer = ToMixedColorBuffer(m_pBuffer, false);
             break;
         default:
-            std::printf("[Image][GetMixedColorBuffer] Abnormal Image Format");
+            std::printf("[Image][GetMixedColorBuffer] Abnormal Image Format\n");
             break;
     }
     return pBuffer;
@@ -328,7 +328,7 @@ unsigned char* Image::ToGrayBuffer() {
             }
             break;
         default:
-            std::printf("[Image][ToGrayImage] Abnormal Image Format");
+            std::printf("[Image][ToGrayImage] Abnormal Image Format\n");
             memset(pResultBuffer, 0, sizeof(char) * nSize);
             break;
     }
@@ -354,7 +354,7 @@ unsigned char* Image::ToRedBuffer() {
             memcpy(pResultBuffer, m_pBuffer + sizeof(char) * nSize * 2, sizeof(char) * nSize);
             break;
         default:
-            std::printf("[Image][ToRedImage] Abnormal Image Format");
+            std::printf("[Image][ToRedImage] Abnormal Image Format\n");
             memset(pResultBuffer, 0, sizeof(char) * nSize);
             break;
     }
@@ -380,7 +380,7 @@ unsigned char* Image::ToGreenBuffer() {
             memcpy(pResultBuffer, m_pBuffer + sizeof(char) * nSize, sizeof(char) * nSize);
             break;
         default:
-            std::printf("[Image][ToGreenImage] Abnormal Image Format");
+            std::printf("[Image][ToGreenImage] Abnormal Image Format\n");
             memset(pResultBuffer, 0, sizeof(char) * nSize);
             break;
     }
@@ -406,7 +406,7 @@ unsigned char* Image::ToBlueBuffer() {
             memcpy(pResultBuffer, m_pBuffer + sizeof(char) * nSize * 2, sizeof(char) * nSize);
             break;
         default:
-            std::printf("[Image][ToRedImage] Abnormal Image Format");
+            std::printf("[Image][ToRedImage] Abnormal Image Format\n");
             memset(pResultBuffer, 0, sizeof(char) * nSize);
             break;
     }
@@ -423,7 +423,7 @@ Image* Image::ToBlueImage() {
 bool Image::LoadBitmap(const string &strPath) {
     ifstream pStream(strPath.c_str(), ios::binary);
     if (!pStream) {
-        std::printf("[Image][LoadBitmap] File Path is not correct");
+        std::printf("[Image][LoadBitmap] File Path is not correct\n");
         return false;
     }
 
@@ -441,7 +441,7 @@ bool Image::LoadBitmap(const string &strPath) {
     BitmapFactory::ReadBitmapFileHeader(pStream, pFileHeader);
     BitmapFactory::ReadBitmapInfoHeader(pStream, pInfoHeader);
     if (pInfoHeader.size != pInfoHeader.headerSize()) {
-        std::printf("[Image][LoadBitmap] Invalid Bitmap Size");
+        std::printf("[Image][LoadBitmap] Invalid Bitmap Size\n");
         pFileHeader.clear();
         pInfoHeader.clear();
         pStream.close();
@@ -468,7 +468,7 @@ bool Image::LoadBitmap(const string &strPath) {
         pStream.close();
     }
     catch (int nCode) {
-        std::printf("[Image][LoadBitmap] Buffer Reading Error");
+        std::printf("[Image][LoadBitmap] Buffer Reading Error\n");
         pFileHeader.clear();
         pInfoHeader.clear();
         pStream.close();
@@ -487,11 +487,11 @@ bool Image::LoadBitmap(const string &strPath) {
 bool Image::SaveBitmap(const string &strPath) {
     ofstream pStream(strPath.c_str(), ios::binary);
     if (!pStream) {
-        std::printf("[Image][SaveBitmap] File Path is not correct");
+        std::printf("[Image][SaveBitmap] File Path is not correct\n");
         return false;
     }
     if (!m_pBuffer) {
-        std::printf("[Image][SaveBitmap] Buffer is empty");
+        std::printf("[Image][SaveBitmap] Buffer is empty\n");
         return false;
     }
 
