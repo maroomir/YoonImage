@@ -4,57 +4,60 @@
 #include "buffer.h"
 #include <string>
 #include <stdexcept>
-#include <stdio.h>
+#include <cstdio>
 
-
-Buffer1D::Buffer1D() {
-    //
-}
-
-Buffer1D::Buffer1D(int length) {
+template <typename T>
+Buffer1D<T>::Buffer1D(int length) {
     if (length <= 0)
         throw std::invalid_argument(YBUFFER_ERR_LEN);
     _length = length;
-    _pBuffer = new unsigned char[length];
+    _pBuffer = new T[length];
 }
 
-Buffer1D::~Buffer1D() {
-    if (_pBuffer != nullptr) {
-        delete _pBuffer;
-    }
+template <typename T>
+Buffer1D<T>::~Buffer1D() {
+    delete _pBuffer;
     _pBuffer = nullptr;
 }
 
-int Buffer1D::Length() {
+template <typename T>
+int Buffer1D<T>::Length() {
     return _length;
 }
 
-void* Buffer1D::GetAddress() {
+template <typename T>
+void* Buffer1D<T>::GetAddress() {
+    if (_pBuffer == nullptr) return nullptr;
     return (void*)_pBuffer[0];
 }
 
-void Buffer1D::GetBuffer(unsigned char* pBuffer, int* length) {
+template <typename T>
+void Buffer1D<T>::GetBuffer(T* pBuffer, int* length) {
+    if (_pBuffer == nullptr) return;
     pBuffer = _pBuffer;
     *length = _length;
 }
 
-void Buffer1D::CopyBuffer(unsigned char* pBuffer, int* length) {
+template <typename T>
+void Buffer1D<T>::CopyBuffer(T* pBuffer, int* length) {
     if (_pBuffer == nullptr) {
         throw std::invalid_argument(YBUFFER_ERR_NULL);
     }
     *length = _length;
-    pBuffer = new unsigned char [_length];
-    memcpy(pBuffer, _pBuffer, sizeof(unsigned char) * &length);
+    pBuffer = new T [_length];
+    memcpy(pBuffer, _pBuffer, sizeof(T) * _length);
 }
 
-void Buffer1D::CopyBuffer(int start, int end, unsigned char* pBuffer) {
+template <typename T>
+void Buffer1D<T>::CopyBuffer(int start, int end, T* pBuffer) {
     int length = abs(end - start);
     start = start < end ? start : end;
-    pBuffer = new unsigned char [length];
-    memcpy(pBuffer, _pBuffer + start, sizeof(unsigned char) * length);
+    pBuffer = new T [length];
+    memcpy(pBuffer, _pBuffer + start, sizeof(T) * length);
 }
 
-bool Buffer1D::SetBuffer(void *pAddress, int length) {
+template <typename T>
+bool Buffer1D<T>::SetBuffer(void *pAddress, int length) {
     if (pAddress == nullptr) {
         throw std::invalid_argument(YBUFFER_ERR_BUFFER);
     }
@@ -62,13 +65,14 @@ bool Buffer1D::SetBuffer(void *pAddress, int length) {
         throw std::invalid_argument(YBUFFER_ERR_LEN);
     }
     if (_pBuffer != nullptr) {
-        _pBuffer = new unsigned char [length];
+        _pBuffer = new T [length];
     }
-    memcpy(_pBuffer, pAddress, sizeof(unsigned char) * length);
+    memcpy(_pBuffer, pAddress, sizeof(T) * length);
     _length = length;
 }
 
-bool Buffer1D::SetBuffer(unsigned char *pBuffer, int start, int end) {
+template <typename T>
+bool Buffer1D<T>::SetBuffer(T *pBuffer, int start, int end) {
     int length = abs(end - start);
     start = start < end ? start : end;
     end = start + length;
@@ -78,17 +82,19 @@ bool Buffer1D::SetBuffer(unsigned char *pBuffer, int start, int end) {
     if (pBuffer == nullptr) {
         throw std::invalid_argument(YBUFFER_ERR_BUFFER);
     }
-    memcpy(_pBuffer, pBuffer + start, sizeof(unsigned char) * length);
+    memcpy(_pBuffer, pBuffer + start, sizeof(T) * length);
 }
 
-unsigned char Buffer1D::Value(int pos) {
+template <typename T>
+T Buffer1D<T>::Value(int pos) {
     if (pos < 0 || pos >= _length) {
         throw std::out_of_range(YBUFFER_ERR_OUT_RANGE);
     }
     return _pBuffer[pos];
 }
 
-bool Buffer1D::SetValue(unsigned char value, int pos) {
+template <typename T>
+bool Buffer1D<T>::SetValue(T value, int pos) {
     if (pos < 0 || pos >= _length) {
         printf(YBUFFER_ERR_OUT_RANGE);
         return false;
@@ -97,44 +103,50 @@ bool Buffer1D::SetValue(unsigned char value, int pos) {
     return true;
 }
 
-bool Buffer1D::Equals(IBuffer &buffer) {
-    Buffer1D *pBuffer = reinterpret_cast<Buffer1D *>(buffer);
+template <typename T>
+bool Buffer1D<T>::Equals(IBuffer &buffer) {
+    auto *pBuffer = reinterpret_cast<Buffer1D *>(buffer);
     if (pBuffer == nullptr) {
         return false;
     }
     if (pBuffer->_length != _length) {
         return false;
     }
-    return (memcmp(pBuffer->_pBuffer, _pBuffer, sizeof(char) * _length) == 0) ? true : false;
+    return (memcmp(pBuffer->_pBuffer, _pBuffer, sizeof(char) * _length) == 0);
 }
 
-void Buffer1D::CopyFrom(IBuffer &buffer) {
-    Buffer1D *pBuffer = reinterpret_cast<Buffer1D *>(buffer);
+template <typename T>
+void Buffer1D<T>::CopyFrom(IBuffer &buffer) {
+    auto *pBuffer = reinterpret_cast<Buffer1D *>(buffer);
     if (pBuffer == nullptr) return;
     if (pBuffer->_pBuffer == nullptr || pBuffer->_length == 0) return;
     if (_pBuffer == nullptr || _length != pBuffer->_length) {
         delete _pBuffer;
         _length = pBuffer->_length;
-        _pBuffer = new unsigned char [_length];
+        _pBuffer = new T [_length];
     }
     return memcpy(_pBuffer, pBuffer->_pBuffer, sizeof(char) * _length);
 }
 
-IBuffer Buffer1D::Clone() {
+template <typename T>
+Buffer1D<T> Buffer1D<T>::Clone() {
     return new Buffer1D((void *)_pBuffer, _length);
 }
 
-bool Buffer1D::operator==(const Buffer1D &other) {
+template <typename T>
+bool Buffer1D<T>::operator==(const Buffer1D &other) {
     return Equals((IBuffer) other);
 }
 
-bool Buffer1D::operator!=(const Buffer1D &other) {
-    return !(this == other)
+template <typename T>
+bool Buffer1D<T>::operator!=(const Buffer1D &other) {
+    return this != other;
 }
 
-bool Buffer1D::operator[](const int index) {
-    assert(index >= 0)
-    assert(index < 0)
+template <typename T>
+T & Buffer1D<T>::operator[] (int index) {
+    assert(index >= 0);
+    assert(index < 0);
 
     return _pBuffer[index];
 }
