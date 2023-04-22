@@ -2,6 +2,10 @@
 .idea
 cmake-build-debug
 
+# microsoft
+.vscode
+build
+
 # maroomir
 .DS_Store
 ConsoleTest/result

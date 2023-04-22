@@ -5,20 +5,33 @@
 #ifndef YOONIMAGE_IMAGE_H
 #define YOONIMAGE_IMAGE_H
 
-#include "enums.h"
+#include "figure.h"
 #include "bitmap.h"
 #include <string>
 
 using namespace std;
 
+#define INVALID_INTEGER -65536
+#define INVALID_DOUBLE -65536.00
 #define IMAGE_DEFAULT_CHANNEL 1
 #define IMAGE_DEFAULT_WIDTH 640
 #define IMAGE_DEFAULT_HEIGHT 480
 
+typedef enum {
+    FORMAT_NONE = -1,
+    FORMAT_GRAY,
+    FORMAT_RGB,
+    FORMAT_RGB_PARALLEL,
+    FORMAT_RGB_MIXED,
+    FORMAT_BGR,
+    FORMAT_BGR_PARALLEL,
+    FORMAT_BGR_MIXED,
+} IMAGE_FORMAT;
+
 class Image {
 private:
-    static int ToChannel(eImageFormat eFormat);
-    static eImageFormat ToImageFormat(int nChannel);
+    static int ToChannel(IMAGE_FORMAT eFormat);
+    static IMAGE_FORMAT ToImageFormat(int nChannel);
     static unsigned char* ToByte(const int& nNumber);
     static int ToInteger(const unsigned char* pByte);
     unsigned char* ToMixedColorBuffer(const unsigned char* pParallelBuffer, bool bReverseOrder);
@@ -27,7 +40,7 @@ private:
 private:
     unsigned char *m_pBuffer;  // "Gray" or Parallel Color Buffers (R + G + B)
     int m_nWidth, m_nHeight, m_nChannel;
-    eImageFormat m_eFormat;
+    IMAGE_FORMAT m_eFormat;
 
 public:
     Image();
@@ -37,7 +50,7 @@ public:
     Image(int nWidth, int nHeight, int nChannel);
     Image(int *pBuffer, int nWidth, int nHeight);
     Image(unsigned char *pRedBuffer, unsigned char *pGreenBuffer, unsigned char *pBlueBuffer, int nWidth, int nHeight);
-    Image(unsigned char *pBuffer, int nWidth, int nHeight, eImageFormat eFormat);
+    Image(unsigned char *pBuffer, int nWidth, int nHeight, IMAGE_FORMAT eFormat);
 
     int Width();
     int Height();
@@ -46,7 +59,7 @@ public:
     unsigned char* GetBuffer();
     unsigned char* CopyBuffer();
     unsigned char* GetMixedColorBuffer();
-    eImageFormat ImageFormat();
+    IMAGE_FORMAT ImageFormat();
 
     Image* ToGrayImage();
     Image* ToRedImage();

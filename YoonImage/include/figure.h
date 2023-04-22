@@ -1,0 +1,17 @@
+#ifndef YOONIMAGE_FIGURE_H
+#define YOONIMAGE_FIGURE_H
+
+typedef enum {
+    DIR_NONE = -1,
+    DIR_CENTER,
+    DIR_TOP_LEFT,
+    DIR_TOP,
+    DIR_TOP_RIGHT,
+    DIR_RIGHT,
+    DIR_BOTTOM_RIGHT,
+    DIR_BOTTOM,
+    DIR_BOTTOM_LEFT,
+    DIR_LEFT,
+} DIR_2D;
+
+#endif //YOONIMAGE_FIGURE_H

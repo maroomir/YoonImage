@@ -65,7 +65,7 @@ Image::Image(unsigned char *pRedBuffer, unsigned char *pGreenBuffer, unsigned ch
     memcpy(m_pBuffer + nCursor, pBlueBuffer, sizeof(char) * nSize);
 }
 
-Image::Image(unsigned char *pBuffer, int nWidth, int nHeight, eImageFormat eFormat) {
+Image::Image(unsigned char *pBuffer, int nWidth, int nHeight, IMAGE_FORMAT eFormat) {
     m_nWidth = nWidth;
     m_nHeight = nHeight;
     m_nChannel = ToChannel(eFormat);
@@ -114,7 +114,7 @@ Image::~Image() {
     }
 }
 
-int Image::ToChannel(eImageFormat eFormat) {
+int Image::ToChannel(IMAGE_FORMAT eFormat) {
     int nChannel = INVALID_INTEGER;
     switch (eFormat) {
         case FORMAT_GRAY:
@@ -135,8 +135,8 @@ int Image::ToChannel(eImageFormat eFormat) {
     return nChannel;
 }
 
-eImageFormat Image::ToImageFormat(int nChannel) {
-    eImageFormat eFormat = FORMAT_NONE;
+IMAGE_FORMAT Image::ToImageFormat(int nChannel) {
+    IMAGE_FORMAT eFormat = FORMAT_NONE;
     switch (nChannel) {
         case 1:
             eFormat = FORMAT_GRAY;
@@ -229,7 +229,7 @@ unsigned char* Image::CopyBuffer() {
     return pBuffer;
 }
 
-eImageFormat Image::ImageFormat() {
+IMAGE_FORMAT Image::ImageFormat() {
     return m_eFormat;
 }
 
