@@ -27,8 +27,7 @@ int Buffer1D<T>::Length() {
 
 template <typename T>
 void* Buffer1D<T>::GetAddress() {
-    if (_pBuffer == nullptr) return nullptr;
-    return (void*)_pBuffer[0];
+    return (void *)_pBuffer;
 }
 
 template <typename T>
@@ -104,7 +103,7 @@ bool Buffer1D<T>::SetValue(T value, int pos) {
 }
 
 template <typename T>
-bool Buffer1D<T>::Equals(IBuffer &buffer) {
+bool Buffer1D<T>::Equals(buffer_base &buffer) {
     auto *pBuffer = reinterpret_cast<Buffer1D *>(buffer);
     if (pBuffer == nullptr) {
         return false;
@@ -116,7 +115,7 @@ bool Buffer1D<T>::Equals(IBuffer &buffer) {
 }
 
 template <typename T>
-void Buffer1D<T>::CopyFrom(IBuffer &buffer) {
+void Buffer1D<T>::CopyFrom(buffer_base &buffer) {
     auto *pBuffer = reinterpret_cast<Buffer1D *>(buffer);
     if (pBuffer == nullptr) return;
     if (pBuffer->_pBuffer == nullptr || pBuffer->_length == 0) return;
@@ -135,7 +134,7 @@ Buffer1D<T> Buffer1D<T>::Clone() {
 
 template <typename T>
 bool Buffer1D<T>::operator==(const Buffer1D &other) {
-    return Equals((IBuffer) other);
+    return Equals((buffer_base) other);
 }
 
 template <typename T>

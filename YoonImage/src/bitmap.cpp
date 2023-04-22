@@ -1,19 +1,19 @@
 //
 // Created by 윤철중 on 2021/08/18.
 //
-#include "bitmap_factory.h"
+#include "bitmap.h"
 
 // Save the MSB(Most Significant Bit) first
-bool BitmapFactory::IsBigEndian() {
+bool BitmapManager::IsBigEndian() {
     unsigned int nValue = 0x01;
     return (1 != reinterpret_cast<char *>(&nValue)[0]); // RISC CPU
 }
 
-unsigned short BitmapFactory::flipOrder(const unsigned short& nValue) {
+unsigned short BitmapManager::flipOrder(const unsigned short& nValue) {
     return ((nValue >> 8) || (nValue << 8));
 }
 
-unsigned int BitmapFactory::flipOrder(const unsigned int& nValue) {
+unsigned int BitmapManager::flipOrder(const unsigned int& nValue) {
     return (
             ((nValue & 0xFF000000) >> 0x18) |
             ((nValue & 0x000000FF) << 0x18) |
@@ -22,24 +22,24 @@ unsigned int BitmapFactory::flipOrder(const unsigned int& nValue) {
     );
 }
 
-size_t BitmapFactory::GetFileSize(const string &strPath) {
-    ifstream pFile(strPath.c_str(), ios::in | ios::binary);
+size_t BitmapManager::GetFileSize(const std::string &strPath) {
+    std::ifstream pFile(strPath.c_str(), std::ios::in | std::ios::binary);
     if (!pFile) return 0;
-    pFile.seekg(0, ios::end);
+    pFile.seekg(0, std::ios::end);
     return static_cast<size_t>(pFile.tellg());
 }
 
 template <typename T>
-void BitmapFactory::ReadStream(ifstream& pStream, T& value) {
+void BitmapManager::ReadStream(std::ifstream& pStream, T& value) {
     pStream.read(reinterpret_cast<char *>(&value), sizeof(T));
 }
 
 template <typename T>
-void BitmapFactory::WriteStream(ofstream& pStream, const T& value)  {
+void BitmapManager::WriteStream(std::ofstream& pStream, const T& value)  {
     pStream.write(reinterpret_cast<const char*>(&value), sizeof(T));
 }
 
-void BitmapFactory::ReadBitmapFileHeader(ifstream& pStream, BITMAP_FILE_HEADER& pHeader) {
+void BitmapManager::ReadBitmapFileHeader(std::ifstream& pStream, bitmap_file_header& pHeader) {
     ReadStream(pStream, pHeader.type);
     ReadStream(pStream, pHeader.size);
     ReadStream(pStream, pHeader.reserved1);
@@ -54,7 +54,7 @@ void BitmapFactory::ReadBitmapFileHeader(ifstream& pStream, BITMAP_FILE_HEADER& 
     }
 }
 
-void BitmapFactory::ReadBitmapInfoHeader(ifstream& pStream, BITMAP_INFO_HEADER& pHeader) {
+void BitmapManager::ReadBitmapInfoHeader(std::ifstream& pStream, bitmap_info_header& pHeader) {
     ReadStream(pStream, pHeader.size);
     ReadStream(pStream, pHeader.width);
     ReadStream(pStream, pHeader.height);
@@ -81,7 +81,7 @@ void BitmapFactory::ReadBitmapInfoHeader(ifstream& pStream, BITMAP_INFO_HEADER& 
     }
 }
 
-void BitmapFactory::WriteBitmapFileHeader(ofstream& pStream, BITMAP_FILE_HEADER& pHeader) {
+void BitmapManager::WriteBitmapFileHeader(std::ofstream& pStream, bitmap_file_header& pHeader) {
     if (IsBigEndian()) {
         WriteStream(pStream, flipOrder(pHeader.type));
         WriteStream(pStream, flipOrder(pHeader.size));
@@ -97,7 +97,7 @@ void BitmapFactory::WriteBitmapFileHeader(ofstream& pStream, BITMAP_FILE_HEADER&
     }
 }
 
-void BitmapFactory::WriteBitmapInfoHeader(ofstream& pStream, BITMAP_INFO_HEADER& pHeader) {
+void BitmapManager::WriteBitmapInfoHeader(std::ofstream& pStream, bitmap_info_header& pHeader) {
     if (IsBigEndian()) {
         WriteStream(pStream, flipOrder(pHeader.size));
         WriteStream(pStream, flipOrder(pHeader.width));
@@ -125,22 +125,22 @@ void BitmapFactory::WriteBitmapInfoHeader(ofstream& pStream, BITMAP_INFO_HEADER&
     }
 }
 
-void BitmapFactory::WriteBitmapPaletteTable(ofstream &pStream) {
-    auto *pPalette = new RGBQUAD_PALETTE[256];
+void BitmapManager::WriteBitmapPaletteTable(std::ofstream &pStream) {
+    auto *pPalette = new rgbquad_palette[256];
     for (int i = 0; i < 256; i++) {
         pPalette[i].red = (unsigned char) i;
         pPalette[i].green = (unsigned char) i;
         pPalette[i].blue = (unsigned char) i;
         pPalette[i].reserved = (unsigned char) 0;
     }
-    pStream.write(reinterpret_cast<const char *>(pPalette), sizeof(RGBQUAD_PALETTE) * 256);
+    pStream.write(reinterpret_cast<const char *>(pPalette), sizeof(rgbquad_palette) * 256);
     delete[] pPalette;
 }
 
-RGBQUAD_PALETTE *BitmapFactory::ReadBitmapPaletteTable(ifstream &pStream) {
+rgbquad_palette *BitmapManager::ReadBitmapPaletteTable(std::ifstream &pStream) {
     auto *pPaletteBuffer = new unsigned char[1024];
     pStream.read(reinterpret_cast<char *>(pPaletteBuffer), sizeof(char) * 1024);
-    auto *pResultPalette = new RGBQUAD_PALETTE[1024];
+    auto *pResultPalette = new rgbquad_palette[1024];
     for (int i = 0; i < 256; i++) {
         pResultPalette[i].red = pPaletteBuffer[i * 4];
         pResultPalette[i].green = pPaletteBuffer[i * 4 + 1];
@@ -151,7 +151,7 @@ RGBQUAD_PALETTE *BitmapFactory::ReadBitmapPaletteTable(ifstream &pStream) {
     return pResultPalette;
 }
 
-void BitmapFactory::WriteBitmapBuffer(ofstream &pStream, unsigned char *pBuffer, int nWidth, int nHeight,
+void BitmapManager::WriteBitmapBuffer(std::ofstream &pStream, unsigned char *pBuffer, int nWidth, int nHeight,
                                       int nChannel) {
     int nPlane = nWidth * nChannel;
     unsigned int nPadding = (4 - ((3 * nWidth) % 4)) % 4;
@@ -164,7 +164,7 @@ void BitmapFactory::WriteBitmapBuffer(ofstream &pStream, unsigned char *pBuffer,
 }
 
 unsigned char *
-BitmapFactory::ReadBitmapBuffer(ifstream &pStream, const string &strPath, int nWidth, int nHeight, int nChannel) {
+BitmapManager::ReadBitmapBuffer(std::ifstream &pStream, const std::string &strPath, int nWidth, int nHeight, int nChannel) {
     unsigned int nPadding = (4 - ((3 * nWidth) % 4)) % 4;
     char pPadBuffer[4] = {0x00, 0x00, 0x00, 0x00};
     int nPlane = nWidth * nChannel;

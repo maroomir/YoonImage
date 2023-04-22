@@ -6,7 +6,7 @@
 #define YOONIMAGE_IMAGE_H
 
 #include "enums.h"
-#include "bitmap_factory.h"
+#include "bitmap.h"
 #include <string>
 
 using namespace std;

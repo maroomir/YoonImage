@@ -1,1 +1,7 @@
+# jetbrains
 .idea
+cmake-build-debug
+
+# maroomir
+.DS_Store
+ConsoleTest/result

@@ -2,16 +2,14 @@
 // Created by 윤철중 on 2021/08/17.
 //
 
-#ifndef YOONIMAGE_BITMAP_FACTORY_H
-#define YOONIMAGE_BITMAP_FACTORY_H
+#ifndef YOONIMAGE_BITMAP_H
+#define YOONIMAGE_BITMAP_H
 
 #include <cstring>
 #include <iostream>
 #include <fstream>
 
-using namespace std;
-
-struct BITMAP_FILE_HEADER {
+struct bitmap_file_header {
     unsigned short type;
     unsigned int size;
     unsigned short reserved1;
@@ -27,11 +25,11 @@ struct BITMAP_FILE_HEADER {
     }
 
     void clear() {
-        memset(this, 0x00, sizeof(BITMAP_FILE_HEADER));
+        memset(this, 0x00, sizeof(bitmap_file_header));
     }
 };
 
-struct BITMAP_INFO_HEADER {
+struct bitmap_info_header {
     unsigned int size;
     unsigned int width;
     unsigned int height;
@@ -59,18 +57,18 @@ struct BITMAP_INFO_HEADER {
     }
 
     void clear() {
-        memset(this, 0x00, sizeof(BITMAP_INFO_HEADER));
+        memset(this, 0x00, sizeof(bitmap_info_header));
     }
 };
 
-struct RGBQUAD_PALETTE {
+struct rgbquad_palette {
     unsigned char blue;
     unsigned char green;
     unsigned char red;
     unsigned char reserved;
 };
 
-class BitmapFactory {
+class BitmapManager {
 private:
     static bool IsBigEndian();
 
@@ -78,33 +76,33 @@ private:
 
     static unsigned int flipOrder(const unsigned int &nValue);
 
-    static size_t GetFileSize(const string &strPath);
+    static size_t GetFileSize(const std::string &strPath);
 
     template<typename T>
-    static void ReadStream(ifstream &pStream, T &value);
+    static void ReadStream(std::ifstream &pStream, T &value);
 
     template<typename T>
-    static void WriteStream(ofstream &pStream, const T &value);
+    static void WriteStream(std::ofstream &pStream, const T &value);
 
 public:
-    static void ReadBitmapFileHeader(ifstream &pStream, BITMAP_FILE_HEADER &pHeader);
+    static void ReadBitmapFileHeader(std::ifstream &pStream, bitmap_file_header &pHeader);
 
-    static void ReadBitmapInfoHeader(ifstream &pStream, BITMAP_INFO_HEADER &pHeader);
+    static void ReadBitmapInfoHeader(std::ifstream &pStream, bitmap_info_header &pHeader);
 
-    static void WriteBitmapFileHeader(ofstream &pStream, BITMAP_FILE_HEADER &pHeader);
+    static void WriteBitmapFileHeader(std::ofstream &pStream, bitmap_file_header &pHeader);
 
-    static void WriteBitmapInfoHeader(ofstream &pStream, BITMAP_INFO_HEADER &pHeader);
+    static void WriteBitmapInfoHeader(std::ofstream &pStream, bitmap_info_header &pHeader);
 
-    static void WriteBitmapPaletteTable(ofstream &pStream);
+    static void WriteBitmapPaletteTable(std::ofstream &pStream);
 
-    static RGBQUAD_PALETTE * ReadBitmapPaletteTable(ifstream &pStream);
+    static rgbquad_palette * ReadBitmapPaletteTable(std::ifstream &pStream);
 
     static void
-    WriteBitmapBuffer(ofstream &pStream, unsigned char *pBuffer, int nWidth, int nHeight, int nChannel);
+    WriteBitmapBuffer(std::ofstream &pStream, unsigned char *pBuffer, int nWidth, int nHeight, int nChannel);
 
     static unsigned char *
-    ReadBitmapBuffer(ifstream &pStream, const string &strPath, int nWidth, int nHeight, int nChannel);
+    ReadBitmapBuffer(std::ifstream &pStream, const std::string &strPath, int nWidth, int nHeight, int nChannel);
 };
 
 
-#endif //YOONIMAGE_BITMAP_FACTORY_H
+#endif //YOONIMAGE_BITMAP_H

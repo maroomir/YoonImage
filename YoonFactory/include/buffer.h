@@ -13,23 +13,23 @@
 #define YBUFFER_ERR_OUT_RANGE "[YOONBUFFER] Arguments are out of range"
 #define YBUFFER_ERR_NULL "[YOONBUFFER] Source buffer is null"
 
-struct IBuffer {
+struct buffer_base {
     virtual int Length() = 0;
 
     virtual void* GetAddress() = 0;
 
     virtual bool SetBuffer(void* pAddress, int length) = 0;
 
-    virtual bool Equals(IBuffer &buffer) = 0;
+    virtual bool Equals(buffer_base &buffer) = 0;
 
-    virtual void CopyFrom(IBuffer &buffer) = 0;
+    virtual void CopyFrom(buffer_base &buffer) = 0;
 };
 
 template <typename T>
-class Buffer1D: public IBuffer {
+class Buffer1D: public buffer_base {
 private:
     T *_pBuffer = nullptr;
-    int _length;
+    int _length{};
 
 public:
     explicit Buffer1D(int length);
@@ -54,9 +54,9 @@ public:
 
     bool SetValue(T value, int pos);
 
-    bool Equals(IBuffer &buffer) override;
+    bool Equals(buffer_base &buffer) override;
 
-    void CopyFrom(IBuffer &buffer) override;
+    void CopyFrom(buffer_base &buffer) override;
 
     Buffer1D Clone();
 
@@ -68,25 +68,25 @@ public:
 };
 
 template <typename T>
-class Buffer2D: public IBuffer {
+class Buffer2D: public buffer_base {
 private:
     T* _pBuffer = nullptr;
-    int _length;
-    int _row;
-    int _col;
+    int _length{};
+    int _row{};
+    int _col{};
 
 public:
-    Buffer2D();
-
     Buffer2D(int row, int col);
 
-    int Length();
+    ~Buffer2D();
+
+    int Length() override;
 
     int Rows();
 
     int Cols();
 
-    void* GetAddress();
+    void* GetAddress() override;
 
     void GetBuffer(T *pBuffer, int* row, int* col);
 
@@ -106,17 +106,23 @@ public:
 
     T Value(int row, int col);
 
-    T Value(Vector2N vector);
+    T Value(const Vector2N& vector);
 
     bool SetValue(T value, int row, int col);
 
-    bool SetValue(T value, Vector2N vector);
+    bool SetValue(T value, const Vector2N& vector);
 
-    bool Equals(IBuffer &buffer);
+    bool Equals(buffer_base &buffer);
 
-    void CopyFrom(IBuffer &buffer);
+    void CopyFrom(buffer_base &buffer);
 
     Buffer2D Clone();
+
+    bool operator==(const Buffer2D<T> &other);
+
+    bool operator!=(const Buffer2D<T> &other);
+
+    Buffer1D<T> &operator[](int index);
 };
 
 typedef Buffer1D<unsigned char> GrayBuffer1D;

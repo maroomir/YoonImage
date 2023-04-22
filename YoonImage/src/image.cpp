@@ -434,12 +434,12 @@ bool Image::LoadBitmap(const string &strPath) {
     m_nWidth = 0;
     m_nHeight = 0;
     m_nChannel = 0;
-    BITMAP_FILE_HEADER pFileHeader;
-    BITMAP_INFO_HEADER pInfoHeader;
+    bitmap_file_header pFileHeader;
+    bitmap_info_header pInfoHeader;
     pFileHeader.clear();
     pInfoHeader.clear();
-    BitmapFactory::ReadBitmapFileHeader(pStream, pFileHeader);
-    BitmapFactory::ReadBitmapInfoHeader(pStream, pInfoHeader);
+    BitmapManager::ReadBitmapFileHeader(pStream, pFileHeader);
+    BitmapManager::ReadBitmapInfoHeader(pStream, pInfoHeader);
     if (pInfoHeader.size != pInfoHeader.headerSize()) {
         std::printf("[Image][LoadBitmap] Invalid Bitmap Size\n");
         pFileHeader.clear();
@@ -461,8 +461,8 @@ bool Image::LoadBitmap(const string &strPath) {
     m_eFormat = ToImageFormat(m_nChannel);
     try {
         if (m_eFormat == FORMAT_GRAY)
-            BitmapFactory::ReadBitmapPaletteTable(pStream);
-        unsigned char *pBuffer = BitmapFactory::ReadBitmapBuffer(pStream, strPath, m_nWidth, m_nHeight, m_nChannel);
+            BitmapManager::ReadBitmapPaletteTable(pStream);
+        unsigned char *pBuffer = BitmapManager::ReadBitmapBuffer(pStream, strPath, m_nWidth, m_nHeight, m_nChannel);
         m_pBuffer = ToParallelColorBuffer(pBuffer, true);
         delete[] pBuffer;
         pStream.close();
@@ -495,7 +495,7 @@ bool Image::SaveBitmap(const string &strPath) {
         return false;
     }
 
-    BITMAP_INFO_HEADER pInfoHeader;
+    bitmap_info_header pInfoHeader;
     pInfoHeader.width = m_nWidth;
     pInfoHeader.height = m_nHeight;
     pInfoHeader.bitCount = m_nChannel << 3;  // 00000011 => 00011000
@@ -507,23 +507,23 @@ bool Image::SaveBitmap(const string &strPath) {
     pInfoHeader.bufferSize = (((pInfoHeader.width * m_nChannel) + 3) & 0x0000FFFC) * pInfoHeader.height;
     pInfoHeader.importantColor = 0;
     pInfoHeader.usedColor = 0;
-    BITMAP_FILE_HEADER pFileHeader;
+    bitmap_file_header pFileHeader;
     pFileHeader.type = 19778;  // 0x4D42 (Static Number)
     pFileHeader.size = pFileHeader.headerSize() + pInfoHeader.headerSize() + pInfoHeader.bufferSize;
     pFileHeader.reserved1 = 0;
     pFileHeader.reserved2 = 0;
     pFileHeader.offBits = pInfoHeader.headerSize() + pFileHeader.headerSize();
     if (m_eFormat == FORMAT_GRAY)
-        pFileHeader.offBits += sizeof(RGBQUAD_PALETTE) * 256;
-    BitmapFactory::WriteBitmapFileHeader(pStream, pFileHeader);
-    BitmapFactory::WriteBitmapInfoHeader(pStream, pInfoHeader);
+        pFileHeader.offBits += sizeof(rgbquad_palette) * 256;
+    BitmapManager::WriteBitmapFileHeader(pStream, pFileHeader);
+    BitmapManager::WriteBitmapInfoHeader(pStream, pInfoHeader);
 
     int nSize = m_nWidth * m_nHeight;
     unsigned char *pBufferSaved;
     switch (m_eFormat) {
         case FORMAT_GRAY:
             // Palette Table
-            BitmapFactory::WriteBitmapPaletteTable(pStream);
+            BitmapManager::WriteBitmapPaletteTable(pStream);
             // Pixel Buffer
             pBufferSaved = new unsigned char[sizeof(char) * nSize];
             memcpy(pBufferSaved, m_pBuffer, sizeof(char) * nSize);
@@ -546,7 +546,7 @@ bool Image::SaveBitmap(const string &strPath) {
             memset(pBufferSaved, 0, sizeof(char) * nSize * m_nChannel);
             break;
     }
-    BitmapFactory::WriteBitmapBuffer(pStream, pBufferSaved, m_nWidth, m_nHeight, m_nChannel);
+    BitmapManager::WriteBitmapBuffer(pStream, pBufferSaved, m_nWidth, m_nHeight, m_nChannel);
     pStream.close();
     delete[] pBufferSaved;
     return true;
