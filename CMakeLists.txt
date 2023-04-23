@@ -5,4 +5,3 @@ project(YoonFactory)
 set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(YoonImage)
-add_subdirectory(ConsoleTest)

@@ -10,4 +10,6 @@ include_directories(bitmap)
 
 # CMake instructions to make the static library
 file(GLOB_RECURSE SOURCES src/*.cpp)
+
 add_library(yoonimage ${SOURCES})
+add_subdirectory(unittest)

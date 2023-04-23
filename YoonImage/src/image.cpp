@@ -2,7 +2,7 @@
 // Created by maroomir on 2021-07-05.
 //
 
-#include "image.h"
+#include "yoonimage/image.h"
 
 Image::Image() {
     m_nWidth = IMAGE_DEFAULT_WIDTH;
