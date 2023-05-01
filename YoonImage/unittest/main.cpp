@@ -1,9 +1,10 @@
 //
 // Created by maroomir on 2021-07-05.
 //
-#include "yoonimage/image.h"
+#include "yoonimage/image.hpp"
 
 using namespace std;
+using namespace yoonfactory;
 
 int main() {
     Image image = Image("../../../yoonimage/sample/lena/lena512.bmp");
