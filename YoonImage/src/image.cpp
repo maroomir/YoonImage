@@ -10,7 +10,7 @@ Image::Image() {
     _width = image::default_width;
     _height = image::default_height;
     _channel = image::default_channel;
-    _format = ToImageFormat(_channel);
+    _format = image::ToImageFormat(_channel);
     _buffer = static_cast<unsigned char *>(malloc(sizeof(char) * _width * _height * _channel));
     memset(_buffer, 0, sizeof(char) * _width * _height);
 }
@@ -38,7 +38,7 @@ Image::Image(size_t width, size_t height, size_t channel) {
     _width = width;
     _height = height;
     _channel = channel;
-    _format = ToImageFormat(_channel);
+    _format = image::ToImageFormat(_channel);
     _buffer = static_cast<unsigned char *>(malloc(sizeof(char) * _width * _height * _channel));
     memset(_buffer, 0, sizeof(char) * _width * _height * _channel);
 }
@@ -47,7 +47,7 @@ Image::Image(int* buffer, size_t width, size_t height) {
     _width = width;
     _height = height;
     _channel = 3;
-    _format = ToImageFormat(_channel);
+    _format = image::ToImageFormat(_channel);
     _buffer = static_cast<unsigned char *>(malloc(sizeof(char) * _width * _height * _channel));
     for (int i = 0; i < width * height; i++) {
         unsigned char *pByte = ToByte(buffer[i]);
@@ -88,9 +88,9 @@ Image::Image(unsigned char *buffer, size_t width, size_t height, image::IMAGE_FO
             _buffer = static_cast<unsigned char *>(malloc(sizeof(char) * _width * _height * _channel));
             memcpy(_buffer, buffer, sizeof(char) * _width * _height * _channel);
             break;
-        case image::FORMAT_RGB_MIXED:  // Separate the pixel to Red, Green, Blue buffers
+        case image::FORMAT_RGB_MIXED:  // Separate the pixel to Red, Green, Blue buffer
             _format = image::FORMAT_RGB;
-            _buffer = ToParallelColorBuffer(buffer, false);
+            _buffer = _to_parallel_color_buffer(buffer);
             break;
         case image::FORMAT_BGR:
         case image::FORMAT_BGR_PARALLEL:
@@ -104,7 +104,7 @@ Image::Image(unsigned char *buffer, size_t width, size_t height, image::IMAGE_FO
             break;
         case image::FORMAT_BGR_MIXED:
             _format = image::FORMAT_RGB;
-            _buffer = ToParallelColorBuffer(buffer, true);
+            _buffer = _to_parallel_color_buffer(buffer, true);
             break;
         default:
             std::printf("[Image] Abnormal Image Format\n");
@@ -122,70 +122,12 @@ Image::~Image() {
     }
 }
 
-int Image::ToChannel(image::IMAGE_FORMAT format) {
-    int channel = image::invalid_num;
-    switch (format) {
-        case image::FORMAT_GRAY:
-            channel = 1;
-            break;
-        case image::FORMAT_RGB:
-        case image::FORMAT_RGB_PARALLEL:
-        case image::FORMAT_RGB_MIXED:
-        case image::FORMAT_BGR:
-        case image::FORMAT_BGR_PARALLEL:
-        case image::FORMAT_BGR_MIXED:
-            channel = 3;
-            break;
-        default:
-            std::printf("[Image][ToChannel] Abnormal Image Format\n");
-            break;
-    }
-    return channel;
-}
-
-image::IMAGE_FORMAT Image::ToImageFormat(size_t channel) {
-    image::IMAGE_FORMAT format = image::FORMAT_NONE;
-    switch (channel) {
-        case 1:
-            format = image::FORMAT_GRAY;
-            break;
-        case 3:
-            format = image::FORMAT_RGB;
-            break;
-        default:
-            std::printf("[Image][ToImageFormat] Abnormal Image Channel\n");
-            break;
-    }
-    return format;
-}
-
-unsigned char* Image::ToByte(const int &number) {
-    auto* bytes = new unsigned char[4];
-    bytes[0] = (number & 0x000000ff);
-    bytes[1] = (number & 0x0000ff00) >> 8;
-    bytes[2] = (number & 0x00ff0000) >> 16;
-    bytes[3] = (number & 0xff000000) >> 24;
-    return bytes;
-}
-
-int Image::ToInteger(const unsigned char *bytes) {
-    int num = image::invalid_num;
-    size_t length = sizeof(bytes) / sizeof(char);
-    if (bytes != nullptr && length >= 4) {
-        num += (bytes[0] & 0x000000ff);
-        num += (bytes[1] & 0x000000ff) << 8;
-        num += (bytes[2] & 0x000000ff) << 16;
-        num += (bytes[3] & 0x000000ff) << 24;
-    }
-    return num;
-}
-
-unsigned char* Image::ToParallelColorBuffer(const unsigned char *buffer, bool rgb_order) const {
+unsigned char* Image::_to_parallel_color_buffer(const unsigned char *buffer, bool reverse_order) const {
     auto *result = static_cast<unsigned char *>(malloc(
             sizeof(char) * _width * _height * _channel));
     for (size_t c = 0; c < _channel; c++) {
         size_t start = c * _width * _height;
-        size_t color = (rgb_order) ? _channel - c - 1 : c;  // BRG or RGB
+        size_t color = (reverse_order) ? _channel - c - 1 : c;  // BRG or RGB
         for (int y = 0; y < _height; y++) {
             for (int x = 0; x < _width; x++) {
                 result[start + y * _width + x] = buffer[y * _width * _channel + x * _channel + color];
@@ -195,7 +137,7 @@ unsigned char* Image::ToParallelColorBuffer(const unsigned char *buffer, bool rg
     return result;
 }
 
-unsigned char* Image::ToMixedColorBuffer(const unsigned char *buffer, bool reverse_order) const {
+unsigned char* Image::_to_mixed_color_buffer(const unsigned char *buffer, bool reverse_order) const {
     auto *result = static_cast<unsigned char *>(malloc(
             sizeof(char) * _width * _height * _channel));
 
@@ -254,10 +196,10 @@ unsigned char* Image::GetMixedColorBuffer() {
             break;
         }
         case image::FORMAT_RGB:
-            buffer = ToMixedColorBuffer(_buffer, true);
+            buffer = _to_mixed_color_buffer(_buffer, true);
             break;
         case image::FORMAT_BGR:
-            buffer = ToMixedColorBuffer(_buffer, false);
+            buffer = _to_mixed_color_buffer(_buffer, false);
             break;
         default:
             std::printf("[Image][GetMixedColorBuffer] Abnormal Image Format\n");
@@ -438,13 +380,13 @@ bool Image::LoadBitmap(const std::string &path) {
     _width = 0;
     _height = 0;
     _channel = 0;
-    bitmap::bitmap_file_header file_header{};
-    bitmap::bitmap_info_header info_header{};
+    image::bitmap::bitmap_file_header file_header{};
+    image::bitmap::bitmap_info_header info_header{};
     file_header.clear();
     info_header.clear();
-    bitmap::ReadBitmapFileHeader(stream, file_header);
-    bitmap::ReadBitmapInfoHeader(stream, info_header);
-    if (info_header.size != info_header.headerSize()) {
+    image::bitmap::ReadBitmapFileHeader(stream, file_header);
+    image::bitmap::ReadBitmapInfoHeader(stream, info_header);
+    if (info_header.size != info_header.header_size()) {
         std::printf("[Image][LoadBitmap] Invalid Bitmap Size\n");
         file_header.clear();
         info_header.clear();
@@ -453,7 +395,7 @@ bool Image::LoadBitmap(const std::string &path) {
         _width = image::default_width;
         _height = image::default_height;
         _channel = image::default_channel;
-        _format = ToImageFormat(_channel);
+        _format = image::ToImageFormat(_channel);
         _buffer = static_cast<unsigned char *>(malloc(sizeof(char) * _width * _height * _channel));
         memset(_buffer, 0, sizeof(char) * _width * _height);
         return false;
@@ -462,12 +404,12 @@ bool Image::LoadBitmap(const std::string &path) {
     _width = info_header.width;
     _height = info_header.height;
     _channel = info_header.bit_count >> 3;  // 00011000 => 00000011
-    _format = ToImageFormat(_channel);
+    _format = image::ToImageFormat(_channel);
     try {
         if (_format == image::FORMAT_GRAY)
-            bitmap::ReadBitmapPaletteTable(stream);
-        unsigned char *buffer = bitmap::ReadBitmapBuffer(stream, path, _width, _height, _channel);
-        _buffer = ToParallelColorBuffer(buffer, true);
+            image::bitmap::ReadBitmapPaletteTable(stream);
+        unsigned char *buffer = image::bitmap::ReadBitmapBuffer(stream, _width, _height, _channel);
+        _buffer = _to_parallel_color_buffer(buffer, true);
         delete[] buffer;
         stream.close();
     }
@@ -480,7 +422,7 @@ bool Image::LoadBitmap(const std::string &path) {
         _width = image::default_width;
         _height = image::default_height;
         _channel = image::default_channel;
-        _format = ToImageFormat(_channel);
+        _format = image::ToImageFormat(_channel);
         _buffer = static_cast<unsigned char *>(malloc(sizeof(char) * _width * _height * _channel));
         memset(_buffer, 0, sizeof(char) * _width * _height);
         return false;
@@ -499,46 +441,46 @@ bool Image::SaveBitmap(const std::string &path) {
         return false;
     }
 
-    bitmap::bitmap_info_header info_header{};
+    image::bitmap::bitmap_info_header info_header{};
     info_header.width = _width;
     info_header.height = _height;
     info_header.bit_count = _channel << 3;  // 00000011 => 00011000
     info_header.compression = 0;
     info_header.planes = 1;
-    info_header.size = info_header.headerSize();
+    info_header.size = info_header.header_size();
     info_header.xpels_per_meter = 0;
     info_header.ypels_per_meter = 0;
     info_header.buffer_size = (((info_header.width * _channel) + 3) & 0x0000FFFC) * info_header.height;
     info_header.important_color = 0;
     info_header.used_color = 0;
-    bitmap::bitmap_file_header file_header{};
+    image::bitmap::bitmap_file_header file_header{};
     file_header.type = 0x4D42;  // 0x4D42 (19778, Static Number)
-    file_header.size = file_header.headerSize() + info_header.headerSize() + info_header.buffer_size;
+    file_header.size = file_header.header_size() + info_header.header_size() + info_header.buffer_size;
     file_header.reserved1 = 0;
     file_header.reserved2 = 0;
-    file_header.off_bits = info_header.headerSize() + file_header.headerSize();
+    file_header.off_bits = info_header.header_size() + file_header.header_size();
     if (_format == image::FORMAT_GRAY)
-        file_header.off_bits += sizeof(bitmap::rgbquad_palette) * 256;
-    bitmap::WriteBitmapFileHeader(stream, file_header);
-    bitmap::WriteBitmapInfoHeader(stream, info_header);
+        file_header.off_bits += sizeof(image::bitmap::rgbquad_palette) * 256;
+    image::bitmap::WriteBitmapFileHeader(stream, file_header);
+    image::bitmap::WriteBitmapInfoHeader(stream, info_header);
 
     size_t size = _width * _height;
     unsigned char *buffer;
     switch (_format) {
         case image::FORMAT_GRAY:
             // Palette Table
-            bitmap::WriteBitmapPaletteTable(stream);
+            image::bitmap::WriteBitmapPaletteTable(stream);
             // Pixel Buffer
             buffer = new unsigned char[sizeof(char) * size];
             memcpy(buffer, _buffer, sizeof(char) * size);
             break;
         case image::FORMAT_RGB:
         case image::FORMAT_RGB_PARALLEL:
-            buffer = ToMixedColorBuffer(_buffer, true);  // TO_BGR_MIXED
+            buffer = _to_mixed_color_buffer(_buffer, true);  // TO_BGR_MIXED
             break;
         case image::FORMAT_BGR:
         case image::FORMAT_BGR_PARALLEL:
-            buffer = ToMixedColorBuffer(_buffer, false);  // TO_BGR_MIXED
+            buffer = _to_mixed_color_buffer(_buffer, false);  // TO_BGR_MIXED
             break;
         case image::FORMAT_RGB_MIXED:
         case image::FORMAT_BGR_MIXED:
@@ -550,10 +492,33 @@ bool Image::SaveBitmap(const std::string &path) {
             memset(buffer, 0, sizeof(char) * size * _channel);
             break;
     }
-    bitmap::WriteBitmapBuffer(stream, buffer, _width, _height, _channel);
+    image::bitmap::WriteBitmapBuffer(stream, buffer, _width, _height, _channel);
     stream.close();
     delete[] buffer;
     return true;
+}
+
+bool Image::LoadJpeg(const std::string &path) {
+    // buffer 는 mixed color buffer 로 읽어옴
+    auto buffer = image::jpeg::ReadJpegBuffer(path.c_str(), _width, _height, _channel);
+    if (!buffer) {
+        _buffer = _to_parallel_color_buffer(buffer);
+        _format = image::ToImageFormat(_channel);
+        return true;
+    }
+    std::printf("[Image][LoadJpeg] Invalid jpeg path\n");
+    return false;
+}
+
+bool Image::SaveJpeg(const std::string &path) {
+    // jpeg 로 save 할 때는 mixed color buffer 사용해야함
+    unsigned char *buffer = (_format != image::FORMAT_RGB_MIXED) ? _to_mixed_color_buffer(_buffer) : _buffer;
+    if (!image::jpeg::WriteJpegBuffer(path.c_str(), buffer, _width, _height, (int) _channel)) {
+        std::printf("[Image][SaveJpeg] Jpeg saved failed\n");
+        return false;
+    } else {
+        return true;
+    }
 }
 
 Image *Image::GrayPaletteBar(int width, int height, int step) {

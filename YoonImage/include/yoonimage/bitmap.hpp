@@ -2,14 +2,14 @@
 // Created by 윤철중 on 2021/08/17.
 //
 
-#ifndef YOONIMAGE_BITMAP_H_
-#define YOONIMAGE_BITMAP_H_
+#ifndef YOONIMAGE_BITMAP_HPP
+#define YOONIMAGE_BITMAP_HPP
 
 #include <cstring>
 #include <iostream>
 #include <fstream>
 
-namespace yoonfactory::bitmap {
+namespace yoonfactory::image::bitmap {
     struct bitmap_file_header {
         unsigned short type;
         unsigned int size;
@@ -17,7 +17,7 @@ namespace yoonfactory::bitmap {
         unsigned short reserved2;
         unsigned int off_bits;
 
-        [[nodiscard]] unsigned int headerSize() const {
+        [[nodiscard]] unsigned int header_size() const {
             return sizeof(type) +
                    sizeof(size) +
                    sizeof(reserved1) +
@@ -43,7 +43,7 @@ namespace yoonfactory::bitmap {
         unsigned int used_color;
         unsigned int important_color;
 
-        [[nodiscard]] unsigned int headerSize() const {
+        [[nodiscard]] unsigned int header_size() const {
             return sizeof(size) +
                    sizeof(width) +
                    sizeof(height) +
@@ -226,20 +226,20 @@ namespace yoonfactory::bitmap {
         char pad_buffer[4] = {0x00, 0x00, 0x00, 0x00};
         for (size_t h = 0; h < height; ++h) {
             size_t start = (height - h - 1) * plane;
-            stream.write(reinterpret_cast<const char *>(buffer + sizeof(char) * start), (int)sizeof(char) * plane);
+            stream.write(reinterpret_cast<const char *>(buffer + sizeof(char) * start), (int) sizeof(char) * plane);
             stream.write(pad_buffer, padding);
         }
     }
 
     static unsigned char *
-    ReadBitmapBuffer(std::ifstream &stream, const std::string &path, size_t width, size_t height, size_t channel) {
+    ReadBitmapBuffer(std::ifstream &stream, size_t width, size_t height, size_t channel) {
         unsigned int padding = (4 - ((3 * width) % 4)) % 4;
         char pad[4] = {0x00, 0x00, 0x00, 0x00};
         unsigned int plane = width * channel;
         auto *buffer = new unsigned char[plane * height];
         for (size_t h = 0; h < height; ++h) {
             size_t start = (height - h - 1) * plane;
-            stream.read(reinterpret_cast<char *>(buffer + sizeof(char) * start), (int)sizeof(char) * plane);
+            stream.read(reinterpret_cast<char *>(buffer + sizeof(char) * start), (int) sizeof(char) * plane);
             stream.read(pad, padding);
         }
         return buffer;
@@ -247,4 +247,4 @@ namespace yoonfactory::bitmap {
 }
 
 
-#endif // YOONIMAGE_BITMAP_H_
+#endif // YOONIMAGE_BITMAP_HPP

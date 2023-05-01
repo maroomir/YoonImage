@@ -19,7 +19,7 @@ int main() {
     pRedImage->SaveBitmap("../../../yoonimage/result/lena_red.bmp");
     pGreenImage->SaveBitmap("../../../yoonimage/result/lena_green.bmp");
     pBlueImage->SaveBitmap("../../../yoonimage/result/lena_blue.bmp");
-    pGrayBar->SaveBitmap("../../../yoonimage/result/gray_bar.bmp");
-    pColorBar->SaveBitmap("../../../yoonimage/result/color_bar.bmp");
+    pGrayBar->SaveJpeg("../../../yoonimage/result/gray_bar.jpg");
+    pColorBar->SaveJpeg("../../../yoonimage/result/color_bar.jpg");
     return 0;
 }

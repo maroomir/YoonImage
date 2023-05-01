@@ -1,6 +1,0 @@
-[submodule "YoonImage/bitmap"]
-	path = YoonImage/bitmap
-	url = git@github.com:ArashPartow/bitmap.git
-[submodule "YoonImage/libjpeg-turbo"]
-	path = YoonImage/libjpeg-turbo
-	url = git@github.com:libjpeg-turbo/libjpeg-turbo.git

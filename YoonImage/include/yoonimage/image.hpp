@@ -2,11 +2,12 @@
 // Created by maroomir on 2021-07-05.
 //
 
-#ifndef YOONIMAGE_IMAGE_H_
-#define YOONIMAGE_IMAGE_H_
+#ifndef YOONIMAGE_IMAGE_HPP
+#define YOONIMAGE_IMAGE_HPP
 
 #include "figure.hpp"
 #include "bitmap.hpp"
+#include "jpeg.hpp"
 #include <string>
 
 namespace yoonfactory {
@@ -26,21 +27,70 @@ namespace yoonfactory {
             FORMAT_BGR_PARALLEL,
             FORMAT_BGR_MIXED,
         } IMAGE_FORMAT;
+
+        static int ToChannel(IMAGE_FORMAT format) {
+            int channel = invalid_num;
+            switch (format) {
+                case FORMAT_GRAY:
+                    channel = 1;
+                    break;
+                case FORMAT_RGB:
+                case FORMAT_RGB_PARALLEL:
+                case FORMAT_RGB_MIXED:
+                case FORMAT_BGR:
+                case FORMAT_BGR_PARALLEL:
+                case FORMAT_BGR_MIXED:
+                    channel = 3;
+                    break;
+                default:
+                    std::printf("[Image][ToChannel] Abnormal Image Format\n");
+                    break;
+            }
+            return channel;
+        }
+
+        static IMAGE_FORMAT ToImageFormat(size_t channel) {
+            IMAGE_FORMAT format = FORMAT_NONE;
+            switch (channel) {
+                case 1:
+                    format = FORMAT_GRAY;
+                    break;
+                case 3:
+                    format = FORMAT_RGB;
+                    break;
+                default:
+                    std::printf("[Image][ToImageFormat] Abnormal Image Channel\n");
+                    break;
+            }
+            return format;
+        }
+    }
+
+    static unsigned char *ToByte(const int &number) {
+        auto* bytes = new unsigned char[4];
+        bytes[0] = (number & 0x000000ff);
+        bytes[1] = (number & 0x0000ff00) >> 8;
+        bytes[2] = (number & 0x00ff0000) >> 16;
+        bytes[3] = (number & 0xff000000) >> 24;
+        return bytes;
+    }
+
+    static int ToInteger(const unsigned char *bytes) {
+        int num = image::invalid_num;
+        if (bytes != nullptr) {
+            num += (bytes[0] & 0x000000ff);
+            num += (bytes[1] & 0x000000ff) << 8;
+            num += (bytes[2] & 0x000000ff) << 16;
+            num += (bytes[3] & 0x000000ff) << 24;
+        }
+        return num;
     }
 
     class Image {
     private:
-        static int ToChannel(image::IMAGE_FORMAT format);
+        unsigned char *_to_mixed_color_buffer(const unsigned char *buffer, bool reverse_order = false) const;
 
-        static image::IMAGE_FORMAT ToImageFormat(size_t channel);
-
-        static unsigned char *ToByte(const int &number);
-
-        static int ToInteger(const unsigned char *bytes);
-
-        unsigned char *ToMixedColorBuffer(const unsigned char *buffer, bool reverse_order) const;
-
-        unsigned char *ToParallelColorBuffer(const unsigned char *buffer, bool rgb_order) const;
+        unsigned char *_to_parallel_color_buffer(const unsigned char *buffer, bool reverse_order = false) const;
 
     private:
         unsigned char *_buffer;  // "Gray" or Parallel Color Buffers (R + G + B)
@@ -107,11 +157,15 @@ namespace yoonfactory {
 
         bool SaveBitmap(const std::string &path);
 
-    public:
-        static Image *GrayPaletteBar(int width = 256, int height = 50, int step=10);
+        bool LoadJpeg(const std::string &path);
 
-        static Image *ColorPaletteBar(int width = 256, int height = 50, int step=10);
+        bool SaveJpeg(const std::string &path);
+
+    public:
+        static Image *GrayPaletteBar(int width = 256, int height = 50, int step = 10);
+
+        static Image *ColorPaletteBar(int width = 256, int height = 50, int step = 10);
     };
 }
 
-#endif // YOONIMAGE_IMAGE_H_
+#endif // YOONIMAGE_IMAGE_HPP
