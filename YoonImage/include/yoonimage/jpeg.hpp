@@ -108,7 +108,7 @@ namespace yoonfactory::image::jpeg {
         (void) jpeg_finish_decompress(&info);
         jpeg_destroy_decompress(&info);
         fclose(file);
-        return (unsigned char *) buffer;
+        return reinterpret_cast<unsigned char *>(buffer);
     }
 }
 

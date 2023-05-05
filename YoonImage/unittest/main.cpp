@@ -7,7 +7,7 @@ using namespace std;
 using namespace yoonfactory;
 
 int main() {
-    Image image = Image("../../../yoonimage/sample/lena/lena512.bmp");
+    Image image = Image("../../../yoonimage/sample/lena/lena512.jpg", image::FILE_JPEG);
     Image *pGrayImage = image.ToGrayImage();
     Image *pRedImage = image.ToRedImage();
     Image* pGreenImage = image.ToGreenImage();

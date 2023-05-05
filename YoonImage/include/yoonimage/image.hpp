@@ -28,6 +28,12 @@ namespace yoonfactory {
             FORMAT_BGR_MIXED,
         } IMAGE_FORMAT;
 
+        typedef enum {
+            FILE_NONE = -1,
+            FILE_BITMAP = 0,
+            FILE_JPEG = 1,
+        } FILE_FORMAT;
+
         static int ToChannel(IMAGE_FORMAT format) {
             int channel = invalid_num;
             switch (format) {
@@ -104,7 +110,7 @@ namespace yoonfactory {
 
         Image(const Image &image);
 
-        explicit Image(const std::string &image_path);
+        explicit Image(const std::string &image_path, image::FILE_FORMAT format);
 
         Image(size_t width, size_t height, size_t channel);
 

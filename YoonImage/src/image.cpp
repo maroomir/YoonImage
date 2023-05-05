@@ -25,13 +25,23 @@ Image::Image(const Image &image) {
 }
 
 
-Image::Image(const std::string &image_path) {
+Image::Image(const std::string &image_path, image::FILE_FORMAT format) {
     _width = image::default_width;
     _height = image::default_height;
     _channel = image::default_channel;
     _format = image::FORMAT_NONE;
     _buffer = nullptr;
-    LoadBitmap(image_path);
+    switch (format) {
+        case image::FILE_BITMAP:
+            LoadBitmap(image_path);
+            break;
+        case image::FILE_JPEG:
+            LoadJpeg(image_path);
+            break;
+        default:
+            std::printf("[Image] Abnormal File Format (file: %s)\n", image_path.c_str());
+            break;
+    }
 }
 
 Image::Image(size_t width, size_t height, size_t channel) {
@@ -382,10 +392,8 @@ bool Image::LoadBitmap(const std::string &path) {
     _channel = 0;
     image::bitmap::bitmap_file_header file_header{};
     image::bitmap::bitmap_info_header info_header{};
-    file_header.clear();
-    info_header.clear();
-    image::bitmap::ReadBitmapFileHeader(stream, file_header);
-    image::bitmap::ReadBitmapInfoHeader(stream, info_header);
+    file_header.read(stream);
+    info_header.read(stream);
     if (info_header.size != info_header.header_size()) {
         std::printf("[Image][LoadBitmap] Invalid Bitmap Size\n");
         file_header.clear();
@@ -461,8 +469,8 @@ bool Image::SaveBitmap(const std::string &path) {
     file_header.off_bits = info_header.header_size() + file_header.header_size();
     if (_format == image::FORMAT_GRAY)
         file_header.off_bits += sizeof(image::bitmap::rgbquad_palette) * 256;
-    image::bitmap::WriteBitmapFileHeader(stream, file_header);
-    image::bitmap::WriteBitmapInfoHeader(stream, info_header);
+    file_header.write(stream);
+    info_header.write(stream);
 
     size_t size = _width * _height;
     unsigned char *buffer;
@@ -501,7 +509,7 @@ bool Image::SaveBitmap(const std::string &path) {
 bool Image::LoadJpeg(const std::string &path) {
     // buffer 는 mixed color buffer 로 읽어옴
     auto buffer = image::jpeg::ReadJpegBuffer(path.c_str(), _width, _height, _channel);
-    if (!buffer) {
+    if (buffer != nullptr) {
         _buffer = _to_parallel_color_buffer(buffer);
         _format = image::ToImageFormat(_channel);
         return true;
