@@ -9,7 +9,7 @@
 #include <iostream>
 #include <fstream>
 
-namespace yoonfactory::image::bitmap {
+namespace yoonfactory { namespace image { namespace bitmap {
     namespace {
         // Save the MSB(Most Significant Bit) first
         bool is_big_endian() {
@@ -244,7 +244,7 @@ namespace yoonfactory::image::bitmap {
         }
         return buffer;
     }
-}
+} } }
 
 
 #endif // YOONIMAGE_BITMAP_HPP
