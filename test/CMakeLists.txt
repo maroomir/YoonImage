@@ -8,3 +8,6 @@ link_directories(${YoonFactory_BINARY_DIR}/YoonImage)
 add_executable(${PROJECT_NAME} main.cpp)
 
 target_link_libraries(${PROJECT_NAME} yoonimage)
+
+target_compile_definitions(${PROJECT_NAME} PUBLIC
+        PREDEFINE_PATH)
