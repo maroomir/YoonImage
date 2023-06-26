@@ -25,7 +25,8 @@ int main(int argc, char** argv) {
     if (root_path.back() != '/') {
         root_path += "/";
     }
-    Image image = Image(root_path + "sample/lena/lena512.jpg", image::FILE_JPEG);
+    Image image = Image(root_path + "sample/lena/lena512.jpg",
+                        image::FILE_JPEG);
     Image *pGrayImage = image.ToGrayImage();
     Image *pRedImage = image.ToRedImage();
     Image* pGreenImage = image.ToGreenImage();
@@ -36,6 +37,7 @@ int main(int argc, char** argv) {
     std::string result_path = root_path + "result/";
     mkdir(result_path);
     image.SaveBitmap(result_path + "lena_origin.bmp");
+    image.SaveJpeg(result_path + "lena_origin.jpg");
     pGrayImage->SaveBitmap(result_path + "lena_gray.bmp");
     pRedImage->SaveBitmap(result_path + "lena_red.bmp");
     pGreenImage->SaveBitmap(result_path + "lena_green.bmp");

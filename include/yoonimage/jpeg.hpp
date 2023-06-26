@@ -70,8 +70,8 @@ namespace yoonfactory::image::jpeg {
         return true;
     }
 
-    static unsigned char*
-    ReadJpegBuffer(const char* path, size_t &width, size_t &height, size_t &channel) {
+    static bool
+    ReadJpegBuffer(const char* path, unsigned char* &result, size_t &width, size_t &height, size_t &channel) {
         // JPEG 압축 정보 읽어오기
         struct jpeg_decompress_struct info{};
         error_manager_t manager;
@@ -79,7 +79,7 @@ namespace yoonfactory::image::jpeg {
         FILE *file = fopen(path, "rb");
         if (!file) {
             std::cerr << "can't open file : " << path << std::endl;
-            return nullptr;
+            return false;
         }
         // JPEG 압축 정보를 가져오던 중 에러가 발생하는지 체크
         info.err = jpeg_std_error(&manager.publisher);
@@ -87,7 +87,7 @@ namespace yoonfactory::image::jpeg {
         if (setjmp(manager.buffer)) {
             jpeg_destroy_decompress(&info);
             fclose(file);
-            return nullptr;
+            return false;
         }
         // JPEG 압축 정보 저장
         jpeg_create_decompress(&info);
@@ -98,17 +98,25 @@ namespace yoonfactory::image::jpeg {
         height = info.output_height;
         channel = info.output_components;
         size_t stride = width * channel;
-        // JPEG buffer 정보 read
-        JSAMPARRAY buffer = (*info.mem->alloc_sarray)
-                ((j_common_ptr) &info, JPOOL_IMAGE, stride, 1);
+        if (result == nullptr) {
+            result = static_cast<unsigned char*> (
+                    malloc(width * height * channel));
+        }
+        // JPEG buffer 정보를 row 별로 read 해서 복사함
+        unsigned long pixel;
+        JSAMPROW row_ptr[1];
+        row_ptr[0] = static_cast<unsigned char*> (malloc(stride));
         while (info.output_scanline < info.output_height) {
-            (void) jpeg_read_scanlines(&info, buffer, 1);
+            (void) jpeg_read_scanlines(&info, row_ptr, 1);
+            for (int i = 0; i < stride; i++) {
+                result[pixel++] = static_cast<unsigned char>(row_ptr[0][i]);
+            }
         }
 
         (void) jpeg_finish_decompress(&info);
         jpeg_destroy_decompress(&info);
         fclose(file);
-        return reinterpret_cast<unsigned char *>(buffer);
+        return true;
     }
 }
 

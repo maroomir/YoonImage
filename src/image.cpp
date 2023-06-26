@@ -508,8 +508,8 @@ bool Image::SaveBitmap(const std::string &path) {
 
 bool Image::LoadJpeg(const std::string &path) {
     // buffer 는 mixed color buffer 로 읽어옴
-    auto buffer = image::jpeg::ReadJpegBuffer(path.c_str(), _width, _height, _channel);
-    if (buffer != nullptr) {
+    unsigned char *buffer = nullptr;
+    if (image::jpeg::ReadJpegBuffer(path.c_str(), buffer, _width, _height, _channel)) {
         _buffer = _to_parallel_color_buffer(buffer);
         _format = image::ToImageFormat(_channel);
         return true;
