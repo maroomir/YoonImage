@@ -10,7 +10,7 @@ Image::Image() {
     _width = image::default_width;
     _height = image::default_height;
     _channel = image::default_channel;
-    _format = image::ToImageFormat(_channel);
+    _format = image::channel_to_default_format[_channel];
     _buffer = static_cast<unsigned char *>(malloc(sizeof(char) * _width * _height * _channel));
     memset(_buffer, 0, sizeof(char) * _width * _height);
 }
@@ -48,7 +48,7 @@ Image::Image(size_t width, size_t height, size_t channel) {
     _width = width;
     _height = height;
     _channel = channel;
-    _format = image::ToImageFormat(_channel);
+    _format = image::channel_to_default_format[_channel];
     _buffer = static_cast<unsigned char *>(malloc(sizeof(char) * _width * _height * _channel));
     memset(_buffer, 0, sizeof(char) * _width * _height * _channel);
 }
@@ -57,7 +57,7 @@ Image::Image(int* buffer, size_t width, size_t height) {
     _width = width;
     _height = height;
     _channel = 3;
-    _format = image::ToImageFormat(_channel);
+    _format = image::channel_to_default_format[_channel];
     _buffer = static_cast<unsigned char *>(malloc(sizeof(char) * _width * _height * _channel));
     for (int i = 0; i < width * height; i++) {
         unsigned char *pByte = ToByte(buffer[i]);
@@ -85,7 +85,7 @@ Image::Image(unsigned char *red_buffer, unsigned char *green_buffer, unsigned ch
 Image::Image(unsigned char *buffer, size_t width, size_t height, image::IMAGE_FORMAT format) {
     _width = width;
     _height = height;
-    _channel = ToChannel(format);
+    _channel = image::format_to_channel[format];
     switch (format) {
         case image::FORMAT_GRAY:
             _format = image::FORMAT_GRAY;
@@ -403,7 +403,7 @@ bool Image::LoadBitmap(const std::string &path) {
         _width = image::default_width;
         _height = image::default_height;
         _channel = image::default_channel;
-        _format = image::ToImageFormat(_channel);
+        _format = image::channel_to_default_format[_channel];
         _buffer = static_cast<unsigned char *>(malloc(sizeof(char) * _width * _height * _channel));
         memset(_buffer, 0, sizeof(char) * _width * _height);
         return false;
@@ -412,7 +412,7 @@ bool Image::LoadBitmap(const std::string &path) {
     _width = info_header.width;
     _height = info_header.height;
     _channel = info_header.bit_count >> 3;  // 00011000 => 00000011
-    _format = image::ToImageFormat(_channel);
+    _format = image::channel_to_default_format[_channel];
     try {
         if (_format == image::FORMAT_GRAY)
             image::bitmap::ReadBitmapPaletteTable(stream);
@@ -430,7 +430,7 @@ bool Image::LoadBitmap(const std::string &path) {
         _width = image::default_width;
         _height = image::default_height;
         _channel = image::default_channel;
-        _format = image::ToImageFormat(_channel);
+        _format = image::channel_to_default_format[_channel];
         _buffer = static_cast<unsigned char *>(malloc(sizeof(char) * _width * _height * _channel));
         memset(_buffer, 0, sizeof(char) * _width * _height);
         return false;
@@ -511,7 +511,7 @@ bool Image::LoadJpeg(const std::string &path) {
     unsigned char *buffer = nullptr;
     if (image::jpeg::ReadJpegBuffer(path.c_str(), buffer, _width, _height, _channel)) {
         _buffer = _to_parallel_color_buffer(buffer);
-        _format = image::ToImageFormat(_channel);
+        _format = image::channel_to_default_format[_channel];
         return true;
     }
     std::printf("[Image][LoadJpeg] Invalid jpeg path\n");

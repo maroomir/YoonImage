@@ -16,6 +16,7 @@ namespace yoonfactory {
         constexpr int default_channel = 1;
         constexpr int default_width = 640;
         constexpr int default_height = 480;
+        constexpr int max_channel = 3;
 
         typedef enum {
             FORMAT_NONE = -1,
@@ -26,70 +27,36 @@ namespace yoonfactory {
             FORMAT_BGR,
             FORMAT_BGR_PARALLEL,
             FORMAT_BGR_MIXED,
+            MAX_IMAGE_FORMAT
         } IMAGE_FORMAT;
 
         typedef enum {
             FILE_NONE = -1,
             FILE_BITMAP = 0,
-            FILE_JPEG = 1,
+            FILE_JPEG,
+            MAX_FILE_FORMAT
         } FILE_FORMAT;
 
-        static int ToChannel(IMAGE_FORMAT format) {
-            int channel = invalid_num;
-            switch (format) {
-                case FORMAT_GRAY:
-                    channel = 1;
-                    break;
-                case FORMAT_RGB:
-                case FORMAT_RGB_PARALLEL:
-                case FORMAT_RGB_MIXED:
-                case FORMAT_BGR:
-                case FORMAT_BGR_PARALLEL:
-                case FORMAT_BGR_MIXED:
-                    channel = 3;
-                    break;
-                default:
-                    std::printf("[Image][ToChannel] Abnormal Image Format\n");
-                    break;
-            }
-            return channel;
-        }
-
-        static IMAGE_FORMAT ToImageFormat(size_t channel) {
-            IMAGE_FORMAT format = FORMAT_NONE;
-            switch (channel) {
-                case 1:
-                    format = FORMAT_GRAY;
-                    break;
-                case 3:
-                    format = FORMAT_RGB;
-                    break;
-                default:
-                    std::printf("[Image][ToImageFormat] Abnormal Image Channel\n");
-                    break;
-            }
-            return format;
-        }
+        constexpr int format_to_channel[MAX_IMAGE_FORMAT] = {
+                1, 3, 3, 3, 3, 3, 3
+        };
+        constexpr IMAGE_FORMAT channel_to_default_format[max_channel] = {
+                FORMAT_GRAY, FORMAT_NONE, FORMAT_RGB
+        };
     }
 
     static unsigned char *ToByte(const int &number) {
         auto* bytes = new unsigned char[4];
-        bytes[0] = (number & 0x000000ff);
-        bytes[1] = (number & 0x0000ff00) >> 8;
-        bytes[2] = (number & 0x00ff0000) >> 16;
-        bytes[3] = (number & 0xff000000) >> 24;
+        bytes[0] = (number & 0xFF);
+        bytes[1] = (number >> 8) & 0xFF;
+        bytes[2] = (number >> 16) & 0xFF;
+        bytes[3] = (number >> 24) & 0xFF;
         return bytes;
     }
 
     static int ToInteger(const unsigned char *bytes) {
-        int num = image::invalid_num;
-        if (bytes != nullptr) {
-            num += (bytes[0] & 0x000000ff);
-            num += (bytes[1] & 0x000000ff) << 8;
-            num += (bytes[2] & 0x000000ff) << 16;
-            num += (bytes[3] & 0x000000ff) << 24;
-        }
-        return num;
+        if (bytes == nullptr) return image::invalid_num;
+        return bytes[0] | bytes[1] << 8 | bytes[2] << 16 | bytes[3] << 24;
     }
 
     class Image {
