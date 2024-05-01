@@ -12,25 +12,25 @@
 namespace yoonfactory { namespace image { namespace bitmap {
     namespace {
         // Save the MSB(Most Significant Bit) first
-        bool is_big_endian() {
+        bool IsBigEndian() {
             unsigned int value = 0x01;
             return (1 != reinterpret_cast<char *>(&value)[0]); // RISC CPU
         }
 
-        unsigned short flip_order(const unsigned short &value) {
+        unsigned short FlipOrder(const unsigned short &value) {
             return ((value >> 8) || (value << 8));
         }
 
-        unsigned int flip_order(const unsigned int &value) {
+        unsigned int FlipOrder(const unsigned int &value) {
             return (
-                    ((value & 0xFF000000) >> 0x18) |
-                    ((value & 0x000000FF) << 0x18) |
-                    ((value & 0x00FF0000) >> 0x08) |
-                    ((value & 0x0000FF00) << 0x08)
+                    ((value & 0xFF000000) >> 24) |
+                    ((value & 0x000000FF) << 24) |
+                    ((value & 0x00FF0000) >> 8) |
+                    ((value & 0x0000FF00) << 8)
             );
         }
 
-        size_t get_file_size(const std::string &path) {
+        size_t GetFileSize(const std::string &path) {
             std::ifstream stream(path.c_str(), std::ios::in | std::ios::binary);
             if (!stream) return 0;
             stream.seekg(0, std::ios::end);
@@ -38,12 +38,12 @@ namespace yoonfactory { namespace image { namespace bitmap {
         }
 
         template<typename T>
-        void read_stream(std::ifstream &stream, T &value) {
+        void ReadStream(std::ifstream &stream, T &value) {
             stream.read(reinterpret_cast<char *>(&value), sizeof(T));
         }
 
         template<typename T>
-        void write_stream(std::ofstream &stream, const T &value) {
+        void WriteStream(std::ofstream &stream, const T &value) {
             stream.write(reinterpret_cast<const char *>(&value), sizeof(T));
         }
     }
@@ -64,33 +64,33 @@ namespace yoonfactory { namespace image { namespace bitmap {
         }
 
         void read(std::ifstream &stream) {
-            read_stream(stream, type);
-            read_stream(stream, size);
-            read_stream(stream, reserved1);
-            read_stream(stream, reserved2);
-            read_stream(stream, off_bits);
-            if (is_big_endian()) {
-                type = flip_order(type);
-                size = flip_order(size);
-                reserved1 = flip_order(reserved1);
-                reserved2 = flip_order(reserved2);
-                off_bits = flip_order(off_bits);
+            ReadStream(stream, type);
+            ReadStream(stream, size);
+            ReadStream(stream, reserved1);
+            ReadStream(stream, reserved2);
+            ReadStream(stream, off_bits);
+            if (IsBigEndian()) {
+                type = FlipOrder(type);
+                size = FlipOrder(size);
+                reserved1 = FlipOrder(reserved1);
+                reserved2 = FlipOrder(reserved2);
+                off_bits = FlipOrder(off_bits);
             }
         }
 
         void write(std::ofstream &stream) const {
-            if (is_big_endian()) {
-                write_stream(stream, flip_order(type));
-                write_stream(stream, flip_order(size));
-                write_stream(stream, flip_order(reserved1));
-                write_stream(stream, flip_order(reserved2));
-                write_stream(stream, flip_order(off_bits));
+            if (IsBigEndian()) {
+                WriteStream(stream, FlipOrder(type));
+                WriteStream(stream, FlipOrder(size));
+                WriteStream(stream, FlipOrder(reserved1));
+                WriteStream(stream, FlipOrder(reserved2));
+                WriteStream(stream, FlipOrder(off_bits));
             } else {
-                write_stream(stream, type);
-                write_stream(stream, size);
-                write_stream(stream, reserved1);
-                write_stream(stream, reserved2);
-                write_stream(stream, off_bits);
+                WriteStream(stream, type);
+                WriteStream(stream, size);
+                WriteStream(stream, reserved1);
+                WriteStream(stream, reserved2);
+                WriteStream(stream, off_bits);
             }
         }
 
@@ -127,57 +127,57 @@ namespace yoonfactory { namespace image { namespace bitmap {
         }
 
         void read(std::ifstream &stream) {
-            read_stream(stream, size);
-            read_stream(stream, width);
-            read_stream(stream, height);
-            read_stream(stream, planes);
-            read_stream(stream, bit_count);
-            read_stream(stream, compression);
-            read_stream(stream, buffer_size);
-            read_stream(stream, xpels_per_meter);
-            read_stream(stream, ypels_per_meter);
-            read_stream(stream, used_color);
-            read_stream(stream, important_color);
-            if (is_big_endian()) {
-                size = flip_order(size);
-                width = flip_order(width);
-                height = flip_order(height);
-                planes = flip_order(planes);
-                bit_count = flip_order(bit_count);
-                compression = flip_order(compression);
-                buffer_size = flip_order(buffer_size);
-                xpels_per_meter = flip_order(xpels_per_meter);
-                ypels_per_meter = flip_order(ypels_per_meter);
-                used_color = flip_order(used_color);
-                important_color = flip_order(important_color);
+            ReadStream(stream, size);
+            ReadStream(stream, width);
+            ReadStream(stream, height);
+            ReadStream(stream, planes);
+            ReadStream(stream, bit_count);
+            ReadStream(stream, compression);
+            ReadStream(stream, buffer_size);
+            ReadStream(stream, xpels_per_meter);
+            ReadStream(stream, ypels_per_meter);
+            ReadStream(stream, used_color);
+            ReadStream(stream, important_color);
+            if (IsBigEndian()) {
+                size = FlipOrder(size);
+                width = FlipOrder(width);
+                height = FlipOrder(height);
+                planes = FlipOrder(planes);
+                bit_count = FlipOrder(bit_count);
+                compression = FlipOrder(compression);
+                buffer_size = FlipOrder(buffer_size);
+                xpels_per_meter = FlipOrder(xpels_per_meter);
+                ypels_per_meter = FlipOrder(ypels_per_meter);
+                used_color = FlipOrder(used_color);
+                important_color = FlipOrder(important_color);
             }
         }
 
         void write(std::ofstream &stream) const {
-            if (is_big_endian()) {
-                write_stream(stream, flip_order(size));
-                write_stream(stream, flip_order(width));
-                write_stream(stream, flip_order(height));
-                write_stream(stream, flip_order(planes));
-                write_stream(stream, flip_order(bit_count));
-                write_stream(stream, flip_order(compression));
-                write_stream(stream, flip_order(buffer_size));
-                write_stream(stream, flip_order(xpels_per_meter));
-                write_stream(stream, flip_order(ypels_per_meter));
-                write_stream(stream, flip_order(used_color));
-                write_stream(stream, flip_order(important_color));
+            if (IsBigEndian()) {
+                WriteStream(stream, FlipOrder(size));
+                WriteStream(stream, FlipOrder(width));
+                WriteStream(stream, FlipOrder(height));
+                WriteStream(stream, FlipOrder(planes));
+                WriteStream(stream, FlipOrder(bit_count));
+                WriteStream(stream, FlipOrder(compression));
+                WriteStream(stream, FlipOrder(buffer_size));
+                WriteStream(stream, FlipOrder(xpels_per_meter));
+                WriteStream(stream, FlipOrder(ypels_per_meter));
+                WriteStream(stream, FlipOrder(used_color));
+                WriteStream(stream, FlipOrder(important_color));
             } else {
-                write_stream(stream, size);
-                write_stream(stream, width);
-                write_stream(stream, height);
-                write_stream(stream, planes);
-                write_stream(stream, bit_count);
-                write_stream(stream, compression);
-                write_stream(stream, buffer_size);
-                write_stream(stream, xpels_per_meter);
-                write_stream(stream, ypels_per_meter);
-                write_stream(stream, used_color);
-                write_stream(stream, important_color);
+                WriteStream(stream, size);
+                WriteStream(stream, width);
+                WriteStream(stream, height);
+                WriteStream(stream, planes);
+                WriteStream(stream, bit_count);
+                WriteStream(stream, compression);
+                WriteStream(stream, buffer_size);
+                WriteStream(stream, xpels_per_meter);
+                WriteStream(stream, ypels_per_meter);
+                WriteStream(stream, used_color);
+                WriteStream(stream, important_color);
             }
         }
 

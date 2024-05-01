@@ -17,7 +17,7 @@ namespace yoonfactory::image::jpeg {
             jmp_buf buffer{};
         } error_manager_t;
 
-        void jpeg_error_exit(j_common_ptr info) {
+        void jpegErrorExit(j_common_ptr info) {
             auto * err = (error_manager_t *) info->err;
             (info->err->output_message)(info);
             longjmp(err->buffer, 1);
@@ -83,7 +83,7 @@ namespace yoonfactory::image::jpeg {
         }
         // JPEG 압축 정보를 가져오던 중 에러가 발생하는지 체크
         info.err = jpeg_std_error(&manager.publisher);
-        manager.publisher.error_exit = jpeg_error_exit;
+        manager.publisher.error_exit = jpegErrorExit;
         if (setjmp(manager.buffer)) {
             jpeg_destroy_decompress(&info);
             fclose(file);
